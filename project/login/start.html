@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aqua Market Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="start.css">
+</head>
+<body>
+  <div class="container">
+    <div class="logo">
+        <img src="logo.png" alt="Aqua Market Logo" onclick="navigateToLandingPage()">
+      <h1>AQUAMARKET</h1>
+    </div>
+    <div class="buttons">
+      <button class="login-button" onclick="toggleDropdown()"><b>Login as</b></button>
+      <div id="dropdown" class="dropdown">
+        <button class="dropdown-item" onclick="selectRole('Admin')">Admin</button>
+        <button class="dropdown-item" onclick="selectRole('Seller')">Seller</button>
+        <button class="dropdown-item" onclick="selectRole('Buyer')">Buyer</button>
+      </div>
+      <button class="register-button">Register</button>
+    </div>
+  </div>
+
+  <script src="start.js"></script>
+</body>
+</html>

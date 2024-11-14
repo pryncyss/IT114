@@ -1,0 +1,185 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Poppins, sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color:#fff;
+}
+
+.container {
+  position: relative;
+  display: flex;
+  width: auto;
+  max-width: 900px;
+  height: 70vh;
+  background: linear-gradient(to top, #0d0d36 40%, #000);
+  overflow: hidden;
+  box-shadow: 0 4px 8px #fff(0, 0, 0, 0.2);
+}
+
+.info-section{
+  display: inline;
+  display: flex;
+  width: 80%;
+  max-width: 900px;
+  height: 70vh;
+  background: linear-gradient(to top, #004f6e 20%, #000);
+  overflow: hidden;
+ 
+}
+
+.close-button {
+  position: absolute;
+  top: 20px;
+  right: 40px;
+  font-size: 36px;
+  color: #fff;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  z-index: 1000;
+  transition: color 0.3s ease;
+}
+
+.close-button:hover {
+  color: #00b0ff;
+}
+
+/* Left Section - Login */
+.login-section {
+  width: 50%;
+  padding: 40px;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  text-align: center;
+  margin-top: 5%;
+}
+
+.login-section h2 {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: white;
+}
+
+.login-section form {
+  width: 100%;
+  margin-top: 15%;
+}
+
+.login-section input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #005f7f;
+  border-radius: 15px;
+  background-color: #101035;
+  color: #fff;
+}
+
+.login-section input::placeholder {
+  color: #b0b0c3;
+}
+
+.login-section{
+  color: #00b0ff;
+  font-size: 14px;
+  text-decoration: none;
+  display: inline-block;
+  margin-bottom: 20px;
+}
+
+.forgot-password{
+  color: #fff;
+  font-size: 12px;
+  margin-left: 60%;
+  text-decoration: none;
+  display: block;
+  margin-bottom: 20px;
+  
+}
+
+.login-section button {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  background-color: #00b0ff;
+  color: #fff;
+  font-size: 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.login-section button:hover {
+  background-color: #0095d1;
+}
+
+/* Right Section - Info */
+.info-section {
+  width: 50%;
+  padding: 40px;
+  color: #08B6D9;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.info-section .logo img {
+  width: 80px;
+  margin-bottom: 20px;
+}
+
+.info-section .logo h3 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.info-section p {
+  font-size: 16px;
+  line-height: 1.5;
+  margin-top: 5%;
+  color: #fff;
+}
+
+@media screen and (min-width: 1025px) {
+.forgot-password{
+  align-items: end;
+}
+}
+
+@media screen and (max-width: 768px) {
+  .close-button {
+    top: 10px;
+    right: 20px;
+  }
+  .info-section {
+    display: none; /* Hide the info section on smaller screens */
+  }
+
+  .container {
+    width: 100%;
+    max-width: 400px; /* Adjust container width to center the login form on smaller screens */
+    height: auto;
+    padding: 20px;
+    background: linear-gradient(to top, #0d0d36, #000); 
+  }
+
+  .login-section {
+    width: 100%;
+    align-items: center; 
+  }
+}
+
