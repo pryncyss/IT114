@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login Administrator</title>
+  <title>Login Seller</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="login.css">
 </head>
@@ -13,9 +13,10 @@
     <!-- Left Side - Login Form -->
     <div class="login-section">
       <h2>Login as<br>Seller</h2>
-      <form action="#">
-        <input type="text" placeholder="Username or Work Email" required>
-        <input type="password" placeholder="Password" required>
+      <form onsubmit="validateSellerLogin(event)">
+        <!-- Added name attributes -->
+        <input type="text" name="username" placeholder="Username or Work Email" required>
+        <input type="password" name="password" placeholder="Password" required>
         <a href="#" class="forgot-password">Forgot Password?</a>
         <button type="submit">Login</button>
       </form>
@@ -30,5 +31,26 @@
       <p>Empowering Fish Market<br>Insights at your Fingertips</p>
     </div>
   </div>
+
+  <script>
+    // Corrected function name and logic
+    function validateSellerLogin(event) {
+      event.preventDefault(); // Prevent form submission
+
+      // Accessing input values using the correct attribute (name)
+      const username = document.querySelector('input[name="username"]').value;
+      const password = document.querySelector('input[name="password"]').value;
+
+      // Default seller account credentials
+      const defaultSeller = { username: "seller@gmail.com", password: "seller123" };
+
+      // Validation logic
+      if (username === defaultSeller.username && password === defaultSeller.password) {
+        window.location.href = '../seller/sellerDash.html'; // Redirect to Seller Dashboard
+      } else {
+        alert("Invalid Seller credentials. Please try again.");
+      }
+    }
+  </script>
 </body>
 </html>

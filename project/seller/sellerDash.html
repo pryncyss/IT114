@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AquaMarket Dashboard</title>
+    <link rel="stylesheet" href="sellerDash.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+    --primary-color: #1a1b2e;
+    --secondary-color: #1e90ff;
+    --text-color: #ffffff;
+    --sidebar-width: 240px;
+    --card-bg: #242544;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background-color: var(--primary-color);
+    color: var(--text-color);
+}
+
+.container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    width: var(--sidebar-width);
+    background: linear-gradient(180deg, #08629C 0%, #1a7fd1 100%);
+    padding: 2rem;
+    position: fixed;
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 999;
+    transition: transform 0.3s ease-in-out;
+}
+
+.sidebar.hidden {
+    transform: translateX(-100%);
+}
+
+
+.logo {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.logo img {
+    max-width: 150px;
+}
+
+.logo-text{
+    color: #08B6D9;
+    font-size: 24px;
+}
+
+.nav-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.nav-menu a {
+    color: var(--text-color);
+    text-decoration: none;
+    padding: 1rem;
+    border-radius: 8px;
+    transition: background-color 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.nav-menu a:hover,
+.nav-menu a.active {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.nav-menu a i {
+    width: 20px;
+}
+
+/* Hamburger Menu Button */
+.hamburger {
+    display: none;
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    background: none;
+    border: none;
+    color: var(--text-color);
+    font-size: 1.5rem;
+    z-index: 1000;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+
+/* Main Content Styles */
+.main-content {
+    margin-left: var(--sidebar-width);
+    padding: 2rem;
+    width: calc(100% - var(--sidebar-width));
+}
+
+/* Header Styles */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.header-icons {
+        display: flex;
+        gap: 1rem;
+    }
+
+.search-bar {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 0.75rem 1rem ;
+    display: flex;
+   margin-right: 2%;
+   
+    gap: 0.5rem;
+    width: 300px;
+    margin-left:auto;
+}
+
+.search-bar input {
+    background: none;
+    border: none;
+    color: var(--text-color);
+    width: 100%;
+}
+
+.search-bar input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.header-icons {
+    display: flex;
+    gap: 1rem;
+}
+
+.icon-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: var(--text-color);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.icon-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Sales Summary Styles */
+.summary-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.summary-card {
+    background: var(--card-bg);
+    padding: 1.5rem;
+    border-radius: 12px;
+}
+
+.summary-card h3 {
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    opacity: 0.8;
+}
+
+.summary-card .value {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+}
+
+.summary-card .subtitle {
+    font-size: 0.8rem;
+    opacity: 0.7;
+}
+
+.change {
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+}
+
+.change.positive {
+    color: #4caf50;
+}
+
+.change span {
+    opacity: 0.7;
+}
+
+/* Products Grid Styles */
+/* Products Grid Styles */
+.products-grid {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 15px;
+    scrollbar-width: none; 
+    -ms-overflow-style: none; 
+}
+
+.products-grid::-webkit-scrollbar {
+    display: none;
+}
+
+/* Product Card Styles */
+.productCard {
+    width: 220px; /* Fixed width */
+    height: 320px; /* Fixed height */
+    padding: 1rem;
+    border-radius: 12px;
+    text-align: center;
+    scroll-snap-align: start;
+    flex-shrink: 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.productCard:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Image Wrapper Styles */
+.image-wrapper {
+    background: #0c3c44;
+    border: 2px solid #08B6D9;
+    width: 100%;
+    height: 200px; /* Fixed height for uniformity */
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    overflow: hidden; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.image-wrapper img {
+    border-radius: 8px;
+    width: 100%; 
+    height: 100%; 
+    object-fit: contain; /* Prevent distortion */
+}
+
+/* Product Details */
+.productCard h3 {
+    font-size: 1rem;
+    color: #fff;
+    text-align: start;
+    margin-top: 8px;
+    margin-bottom: auto;
+    white-space: nowrap; /* Prevent text wrapping */
+    overflow: hidden; /* Hide overflowing text */
+    text-overflow: ellipsis; /* Add "..." for overflowing text */
+}
+
+.productCard p {
+    font-size: 14px;
+    color: #fff;
+    text-align: start;
+    margin: 5px 0;
+}
+
+.productCard .price {
+    text-align: start;
+    font-size: 1rem;
+    color: #08B6D9;
+    font-weight: bold;
+}
+
+#logout-btn {
+    width: 100%;
+    padding: 10px 20px;
+    background-color: #f44336;
+    color: white;
+    font-size: 16px;
+    text-align: left;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s ease, transform 0.2s;
+}
+
+#logout-btn:hover {
+    background-color: #d32f2f;
+    transform: scale(1.05);
+}
+
+#logout-btn:active {
+    background-color: #c62828;
+    transform: scale(0.95);
+}
+
+#logout-btn i {
+    margin-right: 10px;
+    font-size: 18px;
+}
+
+.header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .icon-btn {
+            position: relative;
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #ff4444;
+            color: #242544;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: #242544;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            border-radius: 5px;
+            width: 300px;
+            display: none;
+            z-index: 1000;
+        }
+
+        .dropdown-header {
+            padding: 1rem;
+            border-bottom: 1px solid #8ebed6;
+            font-weight: bold;
+        }
+
+        .dropdown-content {
+            max-height: 300px;
+            overflow-y: auto;
+            text-align: start;
+        }
+
+        .dropdown-content p{
+            font-size: 15px;
+        }
+
+        .dropdown-content small{
+            font-size: small;
+        }
+        .dropdown-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .dropdown-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+            margin: 4px;
+        }
+
+        .dropdown-content::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+            transition: background 0.3s ease;
+        }
+
+        .dropdown-content::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
+        }
+
+        /* Firefox scrollbar */
+        .dropdown-content {
+            scrollbar-width:thin;
+            scrollbar-color: #8ebed6 #242544;
+        }
+        
+
+        .dropdown-item {
+            padding: 1rem;
+            border-bottom: 1px solid #8ebed6;
+            cursor: pointer;
+        }
+
+        .dropdown-item:hover {
+            background-color: #8ebed6;
+        }
+
+        .dropdown-item.unread {
+            background-color: #f0f7ff;
+        }
+
+        .user-info {
+            padding: 1rem;
+        }
+
+        .user-info img {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            margin-right: 1rem;
+        }
+
+        .user-info h4 {
+          color: #08B6D9 ; 
+        }
+
+        .user-info p{
+            font-size: medium;
+        }
+
+@media (max-width: 1024px) {
+    .hamburger {
+        display: block;
+    }
+
+    .sidebar {
+        width: var(--sidebar-width);
+        transform: translateX(-100%);
+    }
+
+    .sidebar.active {
+        transform: translateX(0);
+    }
+
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    /* Keep the text in nav menu */
+    .nav-menu a span {
+        display: inline;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 270px; /* Slightly wider for mobile */
+    }
+
+    .nav-menu {
+        flex-direction: column;
+    }
+
+    .nav-menu a {
+        padding: 1rem;
+    }
+
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+        padding: 1rem;
+    }
+
+
+    .search-bar { 
+        display: flex;
+        max-width: 300px;
+    }
+
+    .summary-cards {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
+    .products-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
+
+    .product-card img {
+        height: 120px; /* Smaller image for smaller screens */
+    }
+
+    .popup-container {
+        left: 5%; /* Add padding on small screens */
+        right: 5%; /* Prevent horizontal overflow */
+    }
+}
+
+@media (max-width: 480px) {
+    .summary-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .products-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
+}
+    </style>
+</head>
+<body>
+    <div class="hamburger" onclick="toggleMenu()">
+        <i class="fas fa-bars"></i>
+    </div>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="logo">
+                <img src="../images/logo.png" alt="AquaMarket">
+                <span class="logo-text"><b>AQUAMARKET</b></span>
+            </div>
+            <ul class="nav-menu">
+                <a href="#" class="active"><i class="fas fa-chart-line"></i> Overview</a>
+                <a href="addProduct.html"><i class="fas fa-plus"></i> Add products</a>
+                <a href="ProductList.html"><i class="fas fa-list"></i> Product List</a>
+                <a href="order.html"><i class="fas fa-shopping-cart"></i> Orders</a>
+                <a href="review.html"><i class="fas fa-star"></i>Reviews</a>
+               <!-- <a href="#"><i class="fas fa-briefcase"></i> Business Advisor</a>-->
+                <button id="logout-btn" onclick="redirectToLogin()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Search Bar -->
+            <header class="header">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search">
+                </div>
+                <div class="header-icons">
+                    <button class="icon-btn" id="notification-btn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                        <div class="dropdown" id="notification-dropdown">
+                            <div class="dropdown-header">Notifications</div>
+                            <div class="dropdown-content">
+                                <div class="dropdown-item unread">
+                                    <strong>New Order!</strong>
+                                    <p>Daniel Cervantes ordered Bangus</p>
+                                    <small>2 minutes ago</small>
+                                </div>
+                                <div class="dropdown-item unread">
+                                    <strong>New Review</strong>
+                                    <p>John Doe left a 5-star review on MacBook Air</p>
+                                    <small>15 minutes ago</small>
+                                </div>
+                                <div class="dropdown-item unread">
+                                    <strong>New Order!</strong>
+                                    <p>France Cantano ordered White Leg Shrimp</p>
+                                    <small>25 minutes ago</small>
+                                </div>
+                            </div>
+                        </div>
+                    </button>
+                    <button class="icon-btn" id="message-btn">
+                        <i class="fas fa-message"></i>
+                        <span class="notification-badge">2</span>
+                        <div class="dropdown" id="message-dropdown">
+                            <div class="dropdown-header">Messages</div>
+                            <div class="dropdown-content">
+                                <div class="dropdown-item unread">
+                                    <strong>Cindy Estrobo</strong>
+                                    <p>Is the Blue Crab still in stock?</p>
+                                    <small>5 minutes ago</small>
+                                </div>
+                                <div class="dropdown-item unread">
+                                    <strong>Shiba Garcia</strong>
+                                    <p>When will the Tilapia be available?</p>
+                                    <small>18 minutes ago</small>
+                                </div>
+                                <div class="dropdown-item unread">
+                                    <strong>Daniel Cervantes</strong>
+                                    <p>When will the Tilapia be available?</p>
+                                    <small>30 minutes ago</small>
+                                </div>
+                            </div>
+                        </div>
+                    </button>
+                    <button class="icon-btn" id="user-info-btn">
+                        <i class="fas fa-user"></i>
+                        <div class="dropdown" id="user-dropdown">
+                            <div class="dropdown-header">User Information</div>
+                            <div class="user-info">
+                                <img src="../images/user.png" alt="User Avatar">
+                                <div>
+                                    <h4>AQUAMARKET TEAM</h4>
+                                    <p>aquamarket@gmail.com</p>
+                                    <p>Seller</p>
+                                </div>
+                            </div>
+                        </div>
+                    </button>
+                </div>
+            </header>        
+            <!-- Sales Summary -->
+            <section class="sales-summary">
+                <h2>Sales Summary</h2>
+                <div class="summary-cards">
+                    <div class="summary-card">
+                        <h3>Revenue</h3>
+                        <div class="value">8,101</div>
+                        <div class="subtitle">Total Revenue</div>
+                        <div class="change positive">+22.5% <span>vs prev week</span></div>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Orders</h3>
+                        <div class="value">243</div>
+                        <div class="subtitle">Increase by 22.5%</div>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Reviews</h3>
+                        <div class="value">97</div>
+                        <div class="subtitle">increase by 2%</div>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Visitor</h3>
+                        <div class="value">402</div>
+                        <div class="subtitle">Increase by 15%</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Top-Selling Products -->
+            <section class="products-section">
+                <h2>Your Product</h2>
+                <div class="products-grid">
+                    <!-- Products will be inserted here by JavaScript -->
+                </div>
+            </section>
+
+            <!-- Recent Orders -->
+
+        </main>
+    </div>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+    const notificationBtn = document.getElementById('notification-btn');
+    const messageBtn = document.getElementById('message-btn');
+    const userInfoBtn = document.getElementById('user-info-btn');
+
+    const notificationPopup = document.getElementById('notification-popup');
+    const messagePopup = document.getElementById('message-popup');
+    const userInfoPopup = document.getElementById('user-info-popup');
+
+    const buttons = [notificationBtn, messageBtn, userInfoBtn];
+    const popups = [notificationPopup, messagePopup, userInfoPopup];
+
+    buttons.forEach((btn, index) => {
+        btn.addEventListener('click', (e) => {
+            const popup = popups[index];
+            togglePopup(popup, btn);
+        });
+    });
+    
+
+    function togglePopup(popup, button) {
+        const isActive = popup.classList.contains('active');
+
+        // Close all popups
+        popups.forEach(p => p.classList.remove('active'));
+
+        if (!isActive) {
+            // Position popup relative to the button
+            const buttonRect = button.getBoundingClientRect();
+            const popupWidth = popup.offsetWidth;
+
+            popup.style.top = `${buttonRect.bottom + window.scrollY}px`;
+
+            // Center the popup under the button
+            const leftPosition = buttonRect.left + buttonRect.width / 2 - popupWidth / 2;
+
+            // Ensure popup doesn't overflow on small screens
+            popup.style.left = `${Math.max(10, Math.min(leftPosition, window.innerWidth - popupWidth - 10))}px`;
+
+            popup.classList.add('active');
+        }
+    }
+
+    // Close popups when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.icon-btn') && !e.target.closest('.popup-container')) {
+            popups.forEach(p => p.classList.remove('active'));
+        }
+    });
+});
+
+        // Add this JavaScript to enable swipe functionality
+let touchStartX = 0;
+let touchEndX = 0;
+
+document.querySelector('.products-grid').addEventListener('touchstart', e => {
+    touchStartX = e.changedTouches[0].screenX;
+});
+
+document.querySelector('.products-grid').addEventListener('touchend', e => {
+    touchEndX = e.changedTouches[0].screenX;
+    handleSwipe();
+});
+
+function handleSwipe() {
+    const container = document.querySelector('.products-grid');
+    const swipeThreshold = 50;
+    const scrollAmount = 300;
+    const diff = touchEndX - touchStartX;
+    
+    if (Math.abs(diff) > swipeThreshold) {
+        if (diff > 0) {
+            // Swipe right
+            container.scrollBy({
+                left: -scrollAmount,
+                behavior: 'smooth'
+            });
+        } else {
+            // Swipe left
+            container.scrollBy({
+                left: scrollAmount,
+                behavior: 'smooth'
+            });
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.querySelector('.search-bar input');
+    const searchResultsContainer = document.createElement('div');
+    searchResultsContainer.classList.add('search-results');
+    searchInput.parentElement.appendChild(searchResultsContainer);
+
+    // Add styles for search results
+    const styles = document.createElement('style');
+    styles.textContent = `
+        /* Search Bar Styling */
+.search-bar {
+    position: relative;
+}
+
+/* Search Results Container */
+.search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #242544;
+    border: 1px solid #8ebed6;
+    border-radius: 4px;
+    margin-top: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: none; /* Initially hidden */
+    z-index: 1000;
+}
+
+/* Search Result Items */
+.search-result-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    transition: background 0.2s ease;
+}
+
+.search-result-item:hover {
+    background: #8ebed6;
+}
+
+.search-result-item:last-child {
+    border-bottom: none;
+}
+
+/* Product Image */
+.product-image {
+    width: 50px;
+    height: 50px;
+    object-fit: contents;
+    border-radius: 4px;
+}
+
+/* Product Details */
+.product-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.product-name {
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.product-size {
+    font-size: 12px;
+    color: #fff;
+}
+
+/* Product Price */
+.product-price {
+    font-weight: bold;
+    color: #08B6D9;
+}
+
+/* No Results Message */
+.no-results {
+    padding: 10px;
+    text-align: center;
+    color: #fff;
+    font-style: italic;
+}
+
+
+
+    `;
+    document.head.appendChild(styles);
+
+    // Function to fetch and search products
+    async function searchProducts(searchTerm) {
+        try {
+            // Fetch the product list from your backend or localStorage
+            // For demonstration, I'll use localStorage. In a real application,
+            // you would likely make an API call to your backend
+            const products = JSON.parse(localStorage.getItem('products')) || [];
+            
+            if (searchTerm.trim() === '') {
+                searchResultsContainer.style.display = 'none';
+                return;
+            }
+
+            const filteredProducts = products.filter(product => 
+                product.name.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+
+            // Display results
+            searchResultsContainer.style.display = 'block';
+            
+            if (filteredProducts.length === 0) {
+                searchResultsContainer.innerHTML = `
+                    <div class="no-results">
+                        No products found matching "${searchTerm}"
+                    </div>
+                `;
+                return;
+            }
+
+            searchResultsContainer.innerHTML = filteredProducts.map(product => `
+                <div class="search-result-item">
+                    <div class="product-details">
+                            <img src="${product.image}" alt="${product.name}" class="product-image">
+                            <div>${product.name}</div>
+                    </div>
+                    <div class="product-size">Size: ${product.size}</div>
+                    <div class="product-price">₱${parseFloat(product.price).toFixed(2)}</div>
+                </div>
+            `).join('');
+
+        } catch (error) {
+            console.error('Error searching products:', error);
+            searchResultsContainer.innerHTML = `
+                <div class="no-results">
+                    Error searching products. Please try again.
+                </div>
+            `;
+        }
+    }
+
+    // Add search input event listener with debouncing
+    let debounceTimeout;
+    searchInput.addEventListener('input', (e) => {
+        clearTimeout(debounceTimeout);
+        debounceTimeout = setTimeout(() => {
+            searchProducts(e.target.value);
+        }, 300); // Wait 300ms after user stops typing
+    });
+
+    // Close search results when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!searchInput.contains(e.target) && !searchResultsContainer.contains(e.target)) {
+            searchResultsContainer.style.display = 'none';
+        }
+    });
+
+    // Open search results when clicking on the search input
+    searchInput.addEventListener('click', () => {
+        if (searchInput.value.trim() !== '') {
+            searchProducts(searchInput.value);
+        }
+    });
+});
+       document.addEventListener('DOMContentLoaded', () => {
+        const productsGrid = document.querySelector('.products-grid');
+
+        const products = JSON.parse(localStorage.getItem('products')) || [];
+
+        productsGrid.innerHTML = '';
+
+        products.forEach(product => {
+            const productCard = document.createElement('div');
+            productCard.classList.add('productCard');
+
+            productCard.innerHTML = `
+            <div class="image-wrapper">
+                <img src="${product.image || 'default-image.jpg'}" alt="${product.name}" />
+            </div>
+                <h3>${product.name}</h3>
+                <p>${product.size}</p>
+                <p class="price">₱${product.price}/KG</p>
+            `;
+
+            productsGrid.appendChild(productCard);
+        });
+
+        if (products.length === 0) {
+            productsGrid.innerHTML = '<p>No products available. Add some products to see them here!</p>';
+        }
+    });
+
+        function toggleMenu() {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.toggle('active');
+}
+
+function redirectToLogin() {
+    window.location.href = '../login/loginSeller.html'; 
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+            const buttons = {
+                notification: document.getElementById('notification-btn'),
+                message: document.getElementById('message-btn'),
+                userInfo: document.getElementById('user-info-btn')
+            };
+
+            const dropdowns = {
+                notification: document.getElementById('notification-dropdown'),
+                message: document.getElementById('message-dropdown'),
+                userInfo: document.getElementById('user-dropdown')
+            };
+
+            // Function to close all dropdowns
+            function closeAllDropdowns() {
+                Object.values(dropdowns).forEach(dropdown => {
+                    dropdown.style.display = 'none';
+                });
+            }
+
+            // Handle button clicks
+            Object.keys(buttons).forEach(key => {
+                buttons[key].addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const dropdown = dropdowns[key];
+                    const isVisible = dropdown.style.display === 'block';
+                    
+                    closeAllDropdowns();
+                    
+                    if (!isVisible) {
+                        dropdown.style.display = 'block';
+                        
+                        // Clear notification badge when opened
+                        const badge = this.querySelector('.notification-badge');
+                        if (badge) {
+                            badge.style.display = 'none';
+                        }
+                        
+                        // Mark items as read
+                        const unreadItems = dropdown.querySelectorAll('.unread');
+                        unreadItems.forEach(item => {
+                            item.classList.remove('unread');
+                        });
+                    }
+                });
+            });
+
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', function() {
+                closeAllDropdowns();
+            });
+        });
+    </script>
+</body>
+</html>

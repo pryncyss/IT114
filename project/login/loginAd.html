@@ -13,7 +13,7 @@
     <!-- Left Side - Login Form -->
     <div class="login-section">
       <h2>Login as<br>Administrator</h2>
-      <form action="#">
+      <form onsubmit="validateAdminLogin(event)">
         <input type="text" placeholder="Username or Work Email">
         <input type="password" placeholder="Password">
         <a href="#" class="forgot-password">Forgot Password?</a>
@@ -30,5 +30,24 @@
       <p>Empowering Fish Market<br>Insights at your Fingertips</p>
     </div>
   </div>
+
+  <script>
+    function validateAdminLogin(event) {
+      event.preventDefault(); // Prevent form submission
+
+      const username = document.querySelector('input[name="username"]').value;
+      const password = document.querySelector('input[name="password"]').value;
+
+      // Default admin account
+      const defaultAdmin = { username: "admin@gmail.com", password: "admin123" };
+
+      if (username === defaultAdmin.username && password === defaultAdmin.password) {
+        alert("Login successful!");
+        window.location.href = '../adminDash.html'; // Redirect to Admin Dashboard
+      } else {
+        alert("Invalid Admin credentials. Please try again.");
+      }
+    }
+  </script>
 </body>
 </html>

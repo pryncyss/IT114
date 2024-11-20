@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>Orders</title>
+    <style>
+        * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background-color: #1a1b2e;
+    color: #fff;
+    padding: 20px;
+}
+
+#orderTable {
+    width: 100%;
+}
+
+.table-header, thead tr {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    padding: 15px;
+    background-color: #1a1b2e;
+    border-bottom: 1px solid #2a2b3e;
+    color: #8ebed6;
+    text-align: center;
+}
+
+tbody tr {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    padding: 15px;
+    background-color: #252640;
+    margin: 10px 0;
+    border-radius: 8px;
+    align-items: center;
+    text-align: center;
+}
+
+tbody tr:hover {
+    background-color: #2a2b4a;
+}
+
+th, td {
+    padding: 12px;
+    color: #fff;
+    border: none;
+}
+
+.btn {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 5px;
+}
+
+.btn-approve {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.btn-hold {
+    background-color: #008CBA;
+    color: white;
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
+
+.close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.1);
+    transition: background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.close-btn svg {
+    width: 20px;
+    height: 20px;
+    fill: white;
+}
+    </style>
+</head>
+<body>
+    <button class="close-btn">
+        <svg viewBox="0 0 24 24">
+            <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+        </svg>
+    </button>
+    <table id="orderTable">
+        <thead>
+            <tr>
+                <th>ORDER ID</th>
+                <th>BUYER NAME</th>
+                <th>PRODUCT ITEM</th>
+                <th>KILOGRAM</th>
+                <th>ACTIONS</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <script>
+        const orders = [
+            { id: "1122562849", buyerName: "Daniel Cervantes", productItem: "BANGUS", kilogram: 5 },
+            { id: "3526592389", buyerName: "Marcela Sumatra", productItem: "TILAPIA", kilogram: 5 },
+            { id: "8476711260", buyerName: "Cindy Estrobo", productItem: "LATO", kilogram: 5 },
+            { id: "3277126657", buyerName: "France Cantano", productItem: "WHITE LEG SHRIMP", kilogram: 10},
+            { id: "1023482876", buyerName: "Shiba Garcia", productItem: "BANGUS", kilogram: 8 },
+            { id: "1023482876", buyerName: "Adrian Santos", productItem: "WHITE LEG SHRIMP", kilogram: 5 }
+        ];
+
+        const orderTable = document.getElementById("orderTable");
+        const tbody = orderTable.getElementsByTagName("tbody")[0];
+        const closeBtn = document.querySelector('.close-btn');
+
+        orders.forEach(order => {
+            const row = document.createElement("tr");
+
+            const idCell = document.createElement("td");
+            idCell.textContent = order.id;
+            row.appendChild(idCell);
+
+            const buyerNameCell = document.createElement("td");
+            buyerNameCell.textContent = order.buyerName;
+            row.appendChild(buyerNameCell);
+
+            const productItemCell = document.createElement("td");
+            productItemCell.textContent = order.productItem;
+            row.appendChild(productItemCell);
+
+            const kilogramCell = document.createElement("td");
+            kilogramCell.textContent = order.kilogram;
+            row.appendChild(kilogramCell);
+
+            const actionsCell = document.createElement("td");
+            const holdBtn = document.createElement("button");
+            holdBtn.textContent = "Hold";
+            holdBtn.classList.add("btn", "btn-hold");
+            const approveBtn = document.createElement("button");
+            approveBtn.textContent = "Approve";
+            approveBtn.classList.add("btn", "btn-approve");
+            actionsCell.appendChild(holdBtn);
+            actionsCell.appendChild(approveBtn);
+            row.appendChild(actionsCell);
+
+            tbody.appendChild(row);
+        });
+        closeBtn.addEventListener('click', function() {
+                window.location.href = 'sellerDash.html';
+            });
+    </script>
+</body>
+</html>
