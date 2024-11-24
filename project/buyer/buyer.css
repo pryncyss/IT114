@@ -1,0 +1,516 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  body {
+    background-color: #1a1b2e;
+    color: white;
+    margin: 0;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .logo-container {
+    display: flex;
+    align-items: center; /* Aligns the text vertically in the center */
+    gap: 10px; /* Adds space between the logo and the text */
+  }
+  
+  .logo {
+    height: 50px; /* Adjust based on your logo size */
+  }
+  
+  .logo-text {
+    font-size: 1.5rem; /* Adjust font size as needed */
+    color: #08B6D9; /* Ensure it matches your brand style */
+    margin: 0; /* Remove default margins */
+  }
+  
+  .header-icons {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Space between icons */
+  }
+  
+  .icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .icon-btn:hover {
+    color: #f1f1f1; /* Add hover color effect */
+  }
+    
+  .user-icon {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    font-size: 20px;
+    color: #fff;
+    transition: color 0.3s ease;
+  }
+  
+  .user-icon:hover {
+    color: #f1f1f1;
+  }
+  
+ /* Dropdown styles */
+
+ .dropdown {
+  position: relative;
+  display: inline-block;
+}
+.dropdown-content {
+  display: none;
+  position: absolute;
+  right: 0;
+  background-color: #242544;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.dropdown-content a {
+  display: block;
+  padding: 10px 15px;
+  text-decoration: none;
+  color: #fff;
+  font-size: 14px;
+}
+.dropdown-content a:hover {
+  background-color: #5e5a77;
+}
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+  .search-bar {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    display: flex;
+    gap: 0.5rem;
+    width: 300px;
+    margin-left: auto;
+  }
+  
+  .search-bar input {
+    background: none;
+    border: none;
+    color: white;
+    width: 100%;
+  }
+  
+  .search-bar input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+  }
+  
+  .icon-btn {
+    background: none;
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-left: 2%;
+  }
+  
+  .icon-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+  
+  .products-section {
+    margin-left: 20px; /* Add left margin */
+  }
+  
+  .container {
+    max-width: 1200px;
+    margin: 0 auto; /* Center the container horizontally */
+  }
+  
+/* Products Grid Styles */
+.products-grid {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 15px;
+  scrollbar-width: none; 
+  -ms-overflow-style: none; 
+  margin-top: 5%;
+}
+
+.products-grid::-webkit-scrollbar {
+  display: none;
+}
+
+/* Product Card Styles */
+.productCard {
+  width: 220px; /* Fixed width */
+  height: 330px; /* Fixed height */
+  padding: 1rem;
+  border-radius: 12px;
+  text-align: center;
+  scroll-snap-align: start;
+  background-color: #242544;
+  flex-shrink: 0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.productCard:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Image Wrapper Styles */
+.image-wrapper {
+  background: #0c3c44;
+  border: 2px solid #08B6D9;
+  width: 100%;
+  height: 200px; /* Fixed height for uniformity */
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  overflow: hidden; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.image-wrapper img {
+  border-radius: 8px;
+  width: 100%; 
+  height: 100%; 
+  object-fit: contain; /* Prevent distortion */
+}
+
+/* Product Details */
+.productCard h3 {
+  font-size: 1rem;
+  color: #fff;
+  text-align: start;
+  margin-top: 8px;
+  margin-bottom: auto;
+  white-space: nowrap; /* Prevent text wrapping */
+  overflow: hidden; /* Hide overflowing text */
+  text-overflow: ellipsis; /* Add "..." for overflowing text */
+}
+
+.productCard p {
+  font-size: 14px;
+  color: #fff;
+  text-align: start;
+  margin: 5px 0;
+}
+
+.productCard .price {
+  text-align: start;
+  font-size: 1rem;
+  color: #08B6D9;
+  font-weight: bold;
+}
+
+
+.productCard .stock {
+  text-align: end;
+  right: 10px;
+  font-size: 10px;
+  font-weight: bold;
+}
+.stock-available {
+    color: green;
+    font-weight: bold;
+}
+
+.stock-unavailable {
+    color: red;
+    font-weight: bold;
+}
+
+  
+  /* Category Buttons Container */
+.category-buttons {
+  display: flex;
+  gap: 10px;
+  padding-bottom: 10px; /* Add some space below for better touch scroll */
+  scroll-snap-type: x mandatory; /* Snap scroll */
+}
+
+/* Category Buttons */
+.category-btn {
+  flex-shrink: 0; /* Prevent the buttons from shrinking */
+  background-color: #0077b6;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  white-space: nowrap; /* Prevent text wrapping */
+}
+
+/* Active Category Button */
+.category-btn.active {
+  background-color: #005a8e;
+}
+
+/* Optional: Styling for when scrolling */
+.category-buttons::-webkit-scrollbar {
+  height: 8px;
+}
+
+.category-buttons::-webkit-scrollbar-thumb {
+  background-color:none;
+  border-radius: 10px;
+}
+
+.category-buttons::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+/* Mobile/Tablet Styles */
+@media (max-width: 768px) {
+  /* Enable horizontal scroll on smaller screens */
+  .category-buttons {
+    overflow-x: auto; /* Allow horizontal scrolling */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  }
+}
+
+
+  /* Modal Container */
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  /* Modal Content */
+  .modal-content {
+    background-color: #1a1b2e;
+    color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 800px;
+    width: 90%;
+    display: flex;
+    flex-direction: row; /* Horizontal layout */
+    gap: 20px;
+    position: relative;
+  }
+  
+  /* Close Button */
+  .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #fff;
+  }
+  
+  /* Left Section: Name and Image */
+  .modal-left {
+    flex: 1;
+    text-align: center;
+  }
+  
+  .product-title {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+  
+  .product-image {
+    width: 100%;
+    max-width: 500px;
+    max-height: 500px;
+    border: 2px solid #08B6D9;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Right Section: Details */
+  .modal-right {
+    flex: 1.5;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 15px;
+  }
+  
+  .product-description {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  
+  .product-price {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #08b6d9;
+  }
+  
+  /* Quantity Controls */
+  .quantity-control {
+    display: flex;
+    align-items: center; /* Align vertically */
+    justify-content: center; /* Center horizontally */
+    gap: 10px;
+    margin-top: 10px; /* Optional: Add space above the controls */
+  }
+  
+  .quantity-btn {
+    background: #08b6d9;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  
+  .quantity-btn:hover {
+    background: #005a8e;
+  }
+  
+  .quantity-input {
+    width: 60px;
+    height: 40px;
+    font-size: 1rem;
+    text-align: center;
+    border: 2px solid #08b6d9;
+    border-radius: 4px;
+    color: #fff;
+    background-color: #1a1b2e;
+    outline: none;
+  }
+  
+  .button-group {
+    display: flex;
+    justify-content: center; /* Align horizontally at the center */
+    gap: 10px; /* Add spacing between the buttons */
+    margin-top: 20px; /* Optional: Add space above the buttons */
+  }
+  
+  .add-to-cart-btn,
+  .buy-now-btn {
+    background: #08b6d9;
+    color: white;
+    font-size: 1rem;
+    padding: 10px 20px; /* Adjust padding for consistency */
+    font-size: 16px; /* Ensure text size is the same */
+    cursor: pointer;
+    border: none;
+    border-radius: 8px;
+    transition: background 0.3s ease, transform 0.2s ease;
+  }
+  
+  .add-to-cart-btn:hover {
+    background: #005a8e;
+    transform: scale(1.05);
+  }
+  
+  .buy-now-btn:hover {
+    background: #005a8e;
+    transform: scale(1.05);
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .modal-content {
+      flex-direction: column; /* Stack sections vertically */
+      align-items: center;
+    }
+  
+    .modal-left, .modal-right {
+      flex: unset; /* Remove flex for stacking */
+      width: 100%;
+    }
+  
+    .product-image {
+      max-width: 400px;
+      max-height: 400px;
+    }
+  
+    .cart-item {
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    .cart-item img {
+      margin-bottom: 10px;
+    }
+  
+    .cart-item h4 {
+      text-align: center;
+    }
+  
+    .quantity-control {
+      justify-content: flex-start;
+    }
+  
+    .button-group {
+      flex-direction: column;
+    }
+  }
+
+  .shopping {
+    position: absolute;
+    top: 75%;
+    right: 40px;
+}
+
+.icon-btn-right {
+    font-size: 40px;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    cursor: pointer;
+    border: none;
+    background-color: transparent;
+    color: #fff;
+    transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.icon-btn-right:hover {
+    color: #f1f1f1;
+    transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
+  .shopping{
+    right: 20px;
+  }
+}  
+  

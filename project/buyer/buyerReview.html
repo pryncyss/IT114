@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>Write a Product Review</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #1a1b2e;
+            color: #fff;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+
+        .review-container {
+            display: block;
+            background: #252640;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .review-form {
+            margin-bottom: 20px;
+            padding: 20px;
+            background: #1a1b2e;
+            border-radius: 8px;
+        }
+
+        .form-group label {
+            color: #8ebed6;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #8ebed6;
+            border-radius: 4px;
+            height: 100px;
+            resize: vertical;
+            background-color: #1a1b2e;
+            color: #fff;
+        }
+
+        .write-review-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .write-review-btn:hover {
+            background: #45a049;
+        }
+
+        /* Star Rating */
+        .star-rating span {
+            cursor: pointer;
+            font-size: 24px;
+            color: #ddd;
+        }
+
+        .star-rating span.active {
+            color: #f1c40f;
+        }
+
+        /* Review List */
+        .review-list {
+            margin-top: 20px;
+        }
+
+        .review-card {
+            padding: 15px;
+            border: 1px solid #8ebed6;
+            border-radius: 8px;
+            background: #252640;
+            margin-bottom: 10px;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .reviewer-name {
+            font-weight: bold;
+            color: #8ebed6;
+        }
+
+        .review-date {
+            color: #888;
+            font-size: 0.9em;
+        }
+
+        .review-text {
+            color: #ccc;
+        }
+
+        .helpful-btn {
+            border: none;
+            background: none;
+            color: #8ebed6;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .helpful-btn:hover {
+            color: #fff;
+        }
+
+        .close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.1);
+    transition: background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.close-btn svg {
+    width: 20px;
+    height: 20px;
+    fill: white;
+}
+
+
+    </style>
+</head>
+<body>
+    <button class="close-btn" onclick="window.location.href='purchased.html';">
+        <svg viewBox="0 0 24 24">
+            <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+        </svg>
+    </button>
+    <div class="container">
+        <h1 style="margin-bottom: 20px;">Write a Product Review</h1>
+
+        <div class="review-container">
+            <!-- Review Form -->
+            <div class="review-form" id="reviewForm">
+                <div class="form-group">
+                    <label for="reviewText">Your Review</label>
+                    <textarea id="reviewText" placeholder="Write your review here..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="rating">Rating</label>
+                    <div class="star-rating" id="starRating">
+                        <span onclick="setRating(1)">★</span>
+                        <span onclick="setRating(2)">★</span>
+                        <span onclick="setRating(3)">★</span>
+                        <span onclick="setRating(4)">★</span>
+                        <span onclick="setRating(5)">★</span>
+                    </div>
+                </div>
+
+                <button class="write-review-btn" onclick="submitReview()">Submit Review</button>
+            </div>
+
+            <!-- Reviews List -->
+            <div class="review-list" id="reviewList">
+                <!-- Reviews will be dynamically added here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initial product data
+        const product = {
+            id: 1,
+            name: "Bangus",
+            category: "Fish",
+            price: 180.00,
+            rating: 4.5,
+            reviews: []
+        };
+
+        // Display the reviews
+        function displayReviews() {
+            const reviewList = document.getElementById('reviewList');
+            reviewList.innerHTML = '';
+
+            product.reviews.forEach(review => {
+                const reviewElement = createReviewElement(review);
+                reviewList.appendChild(reviewElement);
+            });
+        }
+
+        // Create review element
+        function createReviewElement(review) {
+            const div = document.createElement('div');
+            div.className = 'review-card';
+            div.innerHTML = `
+                <div class="review-header">
+                    <span class="reviewer-name">${review.name}</span>
+                    <span class="review-date">${review.date}</span>
+                </div>
+                <div class="rating">
+                    ${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}
+                </div>
+                <p class="review-text">${review.text}</p>
+                <button class="helpful-btn" onclick="markHelpful(this)">
+                    👍 Helpful (${review.helpful})
+                </button>
+            `;
+            return div;
+        }
+
+        // Set rating
+        function setRating(rating) {
+            const stars = document.querySelectorAll('#starRating span');
+            stars.forEach((star, index) => {
+                star.classList.toggle('active', index < rating);
+            });
+        }
+
+        // Submit review
+        function submitReview() {
+            const textArea = document.getElementById('reviewText');
+            const activeStars = document.querySelectorAll('#starRating span.active').length;
+
+            if (textArea.value.trim() === '') {
+                alert('Please write a review before submitting');
+                return;
+            }
+
+            const newReview = {
+                name: "You",
+                date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+                rating: activeStars,
+                text: textArea.value,
+                helpful: 0
+            };
+
+            product.reviews.unshift(newReview);
+
+            // Update product rating
+            const totalRatings = product.reviews.reduce((sum, review) => sum + review.rating, 0);
+            product.rating = totalRatings / product.reviews.length;
+
+            // Display the updated reviews
+            displayReviews();
+
+            // Reset the form
+            textArea.value = '';
+            setRating(0);
+        }
+
+        // Mark review as helpful
+        function markHelpful(button) {
+            const currentCount = parseInt(button.textContent.match(/\d+/)[0]);
+            button.textContent = `👍 Helpful (${currentCount + 1})`;
+            button.disabled = true;
+        }
+
+        // Initialize on page load
+        displayReviews();
+    </script>
+
+</body>
+</html>

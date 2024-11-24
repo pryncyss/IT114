@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login Administrator</title>
+  <title>Login Buyer</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="login.css">
 </head>
@@ -13,14 +13,15 @@
     <!-- Left Side - Login Form -->
     <div class="login-section">
       <h2>Login as<br>Buyer</h2>
-      <form action="#">
-        <input type="text" placeholder="Username or Work Email" required>
-        <input type="password" placeholder="Password" required>
+      <form id="loginForm">
+        <!-- Correct IDs for input fields -->
+        <input type="text" id="username" name="username" placeholder="Username or Work Email" required>
+        <input type="password" id="password" name="password" placeholder="Password" required>
         <a href="#" class="forgot-password">Forgot Password?</a>
         <button type="submit">Login</button>
       </form>
     </div>
-
+  
     <!-- Right Side - Logo and Description -->
     <div class="info-section">
       <div class="logo">
@@ -30,5 +31,34 @@
       <p>Empowering Fish Market<br>Insights at your Fingertips</p>
     </div>
   </div>
+  
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+  
+      // Corrected input ID for username
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      const users = JSON.parse(localStorage.getItem('users')) || [];
+  
+      // Find the user
+      const user = users.find(user => user.email === username && user.password === password);
+  
+      if (user) {
+        // Save current user's email to localStorage for session management
+        localStorage.setItem('currentUserEmail', username);
+        // Check if the user role is 'Buyer'
+        if (user.role === 'buyer') {
+          alert('Login successful!');
+          window.location.href = '../buyer/buyerDash.html'; // Redirect to buyer dashboard
+        } else {
+          alert('Invalid credentials: You are not a buyer.');
+        }
+      } else {
+        alert('Invalid credentials: Username or password is incorrect.');
+      }
+    });
+  </script>
+  
 </body>
 </html>

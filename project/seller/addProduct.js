@@ -6,6 +6,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const closeBtn = document.querySelector('.close-btn');
     let imageURL = null;
 
+    // Function to generate a unique product ID
+    function generateProductId() {
+        let productIdCounter = parseInt(localStorage.getItem('productIdCounter')) || 0;
+        productIdCounter++;
+        localStorage.setItem('productIdCounter', productIdCounter); // Save updated ID counter
+        return productIdCounter;
+    }
+
+    // Image upload functionality
     imageUpload.addEventListener('change', function(event) {
         const file = event.target.files[0];
         if (file) {
@@ -38,27 +47,29 @@ document.addEventListener('DOMContentLoaded', function() {
         removePreviewButton.style.display = 'none';
     });
 
-    // Your existing form submission code here...
+    // Product form submission
     const productForm = document.getElementById('productForm');
     productForm.addEventListener('submit', function(e) {
         e.preventDefault();
 
         const productData = {
+            id: generateProductId(),  // Generate a unique ID
             name: document.getElementById('productName').value,
             description: document.getElementById('productDescription').value,
             category: document.getElementById('productCategory').value,
             price: document.getElementById('productPrice').value,
             size: document.getElementById('productSize').value,
-            image: imageURL
+            image: imageURL,
+            inStock: true // Default to "In Stock"
         };
 
         let products = JSON.parse(localStorage.getItem('products')) || [];
-        products.push(productData);
-        localStorage.setItem('products', JSON.stringify(products));
+        products.push(productData); // Add the new product
+        localStorage.setItem('products', JSON.stringify(products)); // Update the products in localStorage
 
         alert('Product added successfully!');
-        
-        // Reset form and preview
+
+        // Reset the form and preview
         productForm.reset();
         imagePreview.innerHTML = '';
         imageUploadContainer.classList.remove('has-preview');

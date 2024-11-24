@@ -13,10 +13,10 @@
     <!-- Left Side - Login Form -->
     <div class="login-section">
       <h2>Login as<br>Seller</h2>
-      <form onsubmit="validateSellerLogin(event)">
+      <form id="loginForm">
         <!-- Added name attributes -->
-        <input type="text" name="username" placeholder="Username or Work Email" required>
-        <input type="password" name="password" placeholder="Password" required>
+        <input type="text" id="username" name="username" placeholder="Username or Work Email" required>
+        <input type="password" id="password" name="password" placeholder="Password" required>
         <a href="#" class="forgot-password">Forgot Password?</a>
         <button type="submit">Login</button>
       </form>
@@ -33,24 +33,31 @@
   </div>
 
   <script>
-    // Corrected function name and logic
-    function validateSellerLogin(event) {
-      event.preventDefault(); // Prevent form submission
-
-      // Accessing input values using the correct attribute (name)
-      const username = document.querySelector('input[name="username"]').value;
-      const password = document.querySelector('input[name="password"]').value;
-
-      // Default seller account credentials
-      const defaultSeller = { username: "seller@gmail.com", password: "seller123" };
-
-      // Validation logic
-      if (username === defaultSeller.username && password === defaultSeller.password) {
-        window.location.href = '../seller/sellerDash.html'; // Redirect to Seller Dashboard
+ document.getElementById('loginForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+  
+      // Corrected input ID for username
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      const users = JSON.parse(localStorage.getItem('users')) || [];
+  
+      // Find the user
+      const user = users.find(user => user.email === username && user.password === password);
+  
+      if (user) {
+        // Save current user's email to localStorage for session management
+        localStorage.setItem('currentUserEmail', username);
+        // Check if the user role is 'Buyer'
+        if (user.role === 'seller') {
+          alert('Login successful!');
+          window.location.href = '../seller/sellerDash.html'; // Redirect to buyer dashboard
+        } else {
+          alert('Invalid credentials: You are not a buyer.');
+        }
       } else {
-        alert("Invalid Seller credentials. Please try again.");
+        alert('Invalid credentials: Username or password is incorrect.');
       }
-    }
+    });
   </script>
 </body>
 </html>

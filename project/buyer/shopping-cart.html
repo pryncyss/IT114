@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>Your Cart</title>
+<style>
+    body {
+    font-family: 'Poppins', sans-serif;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #1a1b2e;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center; /* Aligns the text vertically in the center */
+    gap: 10px; /* Adds space between the logo and the text */
+  }
+  
+  .logo {
+    height: 50px; /* Adjust based on your logo size */
+  }
+  
+  .logo-text {
+    font-size: 1.5rem; /* Adjust font size as needed */
+    color: #08B6D9; /* Ensure it matches your brand style */
+    margin: 0; /* Remove default margins */
+  }
+
+.cart-section {
+    margin-top: 5%;
+    background-color: #242544;
+    border: 2px solid #08B6D9;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+h2,p{
+    color: #fff;
+}
+
+
+
+.cart-items {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.cart-item {
+    display: flex;
+    align-items: center;
+    background-color: #005a8e;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.cart-item-image {
+    width: 100px;
+    height: 100px;
+    object-fit:contents;
+    margin-right: 20px;
+}
+
+.cart-item-details {
+    flex-grow: 1;
+    color: #fff;
+}
+
+.cart-item-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.cart-summary {
+    margin-top: 20px;
+    text-align: right;
+}
+
+.remove-item {
+  display: inline-block;
+  padding: 10px 15px;
+  background-color: red;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  font-size: 1rem;
+  cursor: pointer;
+  text-align: center;
+}
+
+#checkoutBtn {
+    background-color: #08b6d9;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#checkoutBtn:hover{
+    background: #005a8e;
+    transform: scale(1.05);
+  }
+
+  .no-items-message{
+    color: gray;
+    text-align: center;
+  }
+  .close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.1);
+    transition: background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.close-btn svg {
+    width: 20px;
+    height: 20px;
+    fill: white;
+}
+
+/* Container styles */
+.user-info {
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+}
+
+/* Header styles */
+.user-info h3 {
+    color: #fff;
+    font-size: 24px;
+    margin: 0 0 20px 0;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+/* Label styles */
+.user-info label {
+    display: inline-block;
+    font-weight: 600;
+    color: #fff;
+    margin-right: 8px;
+    min-width: 120px;
+    font-size: small;
+}
+
+/* Container for each detail row */
+.user-info div {
+    padding: 0 0;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    position: relative;
+}
+
+/* Text span styles */
+.user-info span {
+    color: #fff;
+    max-width: 400px;
+    font-size: small;    
+}
+
+/* Input field styles */
+.user-info input[type="text"] {
+    padding: 8px 12px;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    font-size: 14px;
+    flex: 1;
+    min-width: 200px;
+    transition: border-color 0.3s ease;
+}
+
+.user-info input[type="text"]:focus {
+    outline: none;
+    border-color: #0099cc;
+    box-shadow: 0 0 0 2px rgba(0, 153, 204, 0.1);
+}
+
+/* Button styles */
+.user-info button {
+    background-color: #0099cc;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.user-info button:hover {
+    background-color: #007aa3;
+}
+
+/* Save button specific styles */
+.user-info button[id*="saveBtn"] {
+    background-color: #4CAF50;
+}
+
+.user-info button[id*="saveBtn"]:hover {
+    background-color: #3d8b40;
+}
+
+/* Responsive design */
+@media screen and (max-width: 480px) {
+    .user-info {
+        padding: 16px;
+        margin: 10px;
+    }
+
+    .user-info div {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .user-info label {
+        margin-bottom: 4px;
+    }
+
+    .user-info input[type="text"] {
+        width: 100%;
+    }
+}
+</style>
+</head>
+<body>
+    <button class="close-btn" onclick="window.location.href='buyerDash.html';">
+        <svg viewBox="0 0 24 24">
+            <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+        </svg>
+    </button>
+
+    <div class="header">
+        <div class="logo-container">
+            <img src="../images/logo.png" alt="Logo" class="logo">
+            <h1 class="logo-text">AQUAMARKET</h1>
+          </div>
+    </div>
+
+    <div class="user-info">
+        <h3>Your Details</h3>
+        
+        <!-- Display address with a 'Change' link -->
+        <div>
+            <label for="userAddress">Address:</label>
+            <span id="addressText"></span>
+            <span id="changeAddressText" style="color: lightskyblue; cursor: pointer;">Change</span> 
+            <input type="text" id="userAddress" placeholder="Enter your address" style="display:none;">
+            <button id="saveAddressBtn" style="display:none;">Save</button>
+        </div>
+        
+        <!-- Display phone number with a 'Change' link -->
+        <div>
+            <label for="userPhone">Phone Number:</label>
+            <span id="phoneText"></span>
+            <span id="changePhoneText" style="color: lightskyblue; cursor: pointer;">Change</span>
+            <input type="text" id="userPhone" placeholder="Enter your phone number" style="display:none;">
+            <button id="savePhoneBtn" style="display:none;">Save</button>
+        </div>
+    </div>
+
+    <main>
+        <div class="cart-section">
+            <h2>Shopping Cart</h2>
+            <div id="cartItems" class="cart-items">
+                <!-- Cart items will be dynamically populated here -->
+            </div>
+    
+            <div class="cart-summary">
+                <p>Total: <span id="cartTotal">0.00</span></p>
+                <button id="checkoutBtn">Checkout</button>
+            </div>
+        </div>
+       
+    </main>
+    
+    <script src="cart.js"></script>
+    
+</body>
+</html>

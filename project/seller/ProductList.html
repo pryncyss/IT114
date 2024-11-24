@@ -320,221 +320,192 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const productList = document.getElementById('productList');
-            const deleteSelected = document.getElementById('deleteSelected');
-            const editModal = document.getElementById('editModal');
-            const closeButton = editModal.querySelector('.edit-btn');
-            const saveButton = editModal.querySelector('form');
-            const closeBtn = document.querySelector('.close-btn');
-            const selectAllCheckbox = document.getElementById('selectAll');
+    const productList = document.getElementById('productList');
+    const deleteSelected = document.getElementById('deleteSelected');
+    const editModal = document.getElementById('editModal');
+    const closeButton = editModal.querySelector('.edit-btn');
+    const saveButton = editModal.querySelector('form');
+    const closeBtn = document.querySelector('.close-btn');
+    const selectAllCheckbox = document.getElementById('selectAll');
 
-            // Load products from localStorage
-            function loadProducts() {
-                const products = JSON.parse(localStorage.getItem('products')) || [];
-                productList.innerHTML = ''; // Clear existing products
+    // Load products from localStorage
+    function loadProducts() {
+        const products = JSON.parse(localStorage.getItem('products')) || [];
+        productList.innerHTML = ''; // Clear existing products
 
-                products.forEach((product, index) => {
-                    const productItem = document.createElement('div');
-                    productItem.classList.add('product-item');
-                    productItem.dataset.productId = index;
+        products.forEach((product) => {
+            const productItem = document.createElement('div');
+            productItem.classList.add('product-item');
+            productItem.dataset.productId = product.id;  // Use unique ID for data attribute
 
-                    const stockBtnClass = product.inStock ? 'btn-success' : 'btn-danger';
-                    const stockBtnText = product.inStock ? 'In Stock' : 'Out of Stock';
+            const stockBtnClass = product.inStock ? 'btn-success' : 'btn-danger';
+            const stockBtnText = product.inStock ? 'In Stock' : 'Out of Stock';
 
-                    productItem.innerHTML = `
-                        <input type="checkbox" class="product-checkbox">
-                        <div class="product-details">
-                            <img src="${product.image}" alt="${product.name}" class="product-image">
-                            <div>${product.name}</div>
-                        </div>
-                        <div>${product.category}</div>
-                        <div>${product.size}</div>
-                        <div>₱${product.price}</div>
-                        <div>
-                            <button class="edit-btn">Edit</button>
-                            <button class="delete-btn">Delete</button>
-                            <button class="stock-btn ${stockBtnClass}">${stockBtnText}</button>
-                        </div>
-                    `;
-                    productList.appendChild(productItem);
-                });
-                
-                // Reset select all checkbox when products are reloaded
-                selectAllCheckbox.checked = false;
-                updateSelectedCount();
-            }
-
-            // Toggle Stock Status Function
-            function toggleStockStatus(productId) {
-                let products = JSON.parse(localStorage.getItem('products')) || [];
-
-                if (productId !== null && products[productId]) {
-                    // Toggle stock status
-                    products[productId].inStock = !products[productId].inStock;
-
-                    // Update localStorage
-                    localStorage.setItem('products', JSON.stringify(products));
-
-                    // Reload the product list to reflect changes
-                    loadProducts();
-                }
-            }
-
-            // Delete single product function
-            function deleteProduct(productId) {
-                let products = JSON.parse(localStorage.getItem('products')) || [];
-                if (productId >= 0 && productId < products.length) {
-                    products.splice(productId, 1);
-                    localStorage.setItem('products', JSON.stringify(products));
-                    loadProducts();
-                    updateSelectedCount();
-                }
-            }
-
-            // Search functionality
-            function initializeSearch() {
-    const searchInput = document.querySelector('.search-bar input');
-    
-    searchInput.addEventListener('input', (e) => {
-        const searchTerm = e.target.value.toLowerCase().trim();
-        
-        if (searchTerm === '') {
-            displayProducts(products);
-            return;
-        }
-
-        const filteredProducts = products.filter(product => 
-            product.name.toLowerCase().includes(searchTerm) ||
-            product.category.toLowerCase().includes(searchTerm)
-        );
-
-        displayProducts(filteredProducts);
-    });
-}
-
-            // Delete multiple products function
-            function deleteMultipleProducts() {
-                let products = JSON.parse(localStorage.getItem('products')) || [];
-                const checkboxes = Array.from(productList.querySelectorAll('.product-checkbox:checked'));
-                
-                // Sort indices in descending order to avoid index shifting problems
-                const indicesToDelete = checkboxes
-                    .map(checkbox => parseInt(checkbox.closest('.product-item').dataset.productId))
-                    .sort((a, b) => b - a);
-
-                // Delete products from highest index to lowest
-                indicesToDelete.forEach(index => {
-                    if (index >= 0 && index < products.length) {
-                        products.splice(index, 1);
-                    }
-                });
-
-                localStorage.setItem('products', JSON.stringify(products));
-                loadProducts();
-                updateSelectedCount();
-            }
-
-            // Event delegation for product list actions
-            productList.addEventListener('click', function (event) {
-                const target = event.target;
-                const productItem = target.closest('.product-item');
-                const productId = productItem ? parseInt(productItem.dataset.productId) : null;
-
-                if (target.classList.contains('edit-btn')) {
-                    openEditModal(productId);
-                } else if (target.classList.contains('delete-btn')) {
-                    deleteProduct(productId);
-                } else if (target.classList.contains('stock-btn')) {
-                    toggleStockStatus(parseInt(productId));
-                } else if (target.classList.contains('product-checkbox')) {
-                    updateSelectedCount();
-                }
-            });
-
-            // Open Edit Modal
-            function openEditModal(productId) {
-                const products = JSON.parse(localStorage.getItem('products')) || [];
-                const product = products[productId];
-
-                if (product) {
-                    // Populate the form with product details
-                    document.getElementById('editName').value = product.name;
-                    document.getElementById('editCategory').value = product.category;
-                    document.getElementById('editSize').value = product.size;
-                    document.getElementById('editPrice').value = product.price;
-
-                    // Save the productId in the form as a data attribute
-                    editModal.querySelector('form').dataset.productId = productId;
-
-                    // Show modal
-                    editModal.style.display = 'block';
-                }
-            }
-
-            // Handle form submission (Save Changes)
-            saveButton.addEventListener('submit', function (event) {
-                event.preventDefault();
-
-                const products = JSON.parse(localStorage.getItem('products')) || [];
-                const productId = editModal.querySelector('form').dataset.productId;
-
-                const product = products[productId];
-                if (product) {
-                    // Update product details
-                    product.name = document.getElementById('editName').value;
-                    product.category = document.getElementById('editCategory').value;
-                    product.size = document.getElementById('editSize').value;
-                    product.price = document.getElementById('editPrice').value;
-
-                    // Save to localStorage
-                    products[productId] = product;
-                    localStorage.setItem('products', JSON.stringify(products));
-
-                    // Close modal and reload products
-                    loadProducts();
-                    closeModal();
-                }
-            });
-
-            // Close the modal
-            function closeModal() {
-                editModal.style.display = 'none';
-            }
-
-            // Close button (Cancel)
-            closeButton.addEventListener('click', closeModal);
-
-            closeBtn.addEventListener('click', function() {
-                window.location.href = 'sellerDash.html';
-            });
-
-            // Select all checkboxes
-            selectAllCheckbox.addEventListener('change', function () {
-                const checkboxes = productList.querySelectorAll('.product-checkbox');
-                checkboxes.forEach(checkbox => {
-                    checkbox.checked = this.checked;
-                });
-                updateSelectedCount();
-            });
-
-            // Update selected count and show/hide delete button
-            function updateSelectedCount() {
-                const checkedBoxes = productList.querySelectorAll('.product-checkbox:checked');
-                const selectedCountElement = document.getElementById('selectedCount');
-                const deleteSection = document.querySelector('.delete-section');
-                const deleteSelectedBtn = document.getElementById('deleteSelected');
-
-                selectedCountElement.textContent = checkedBoxes.length;
-                deleteSection.style.display = checkedBoxes.length > 0 ? 'flex' : 'none';
-                deleteSelectedBtn.disabled = checkedBoxes.length === 0;
-            }
-
-            // Delete selected products
-            deleteSelected.addEventListener('click', deleteMultipleProducts);
-
-            // Initial load of products
-            loadProducts();
+            productItem.innerHTML = `
+                <input type="checkbox" class="product-checkbox">
+                <div class="product-details">
+                    <img src="${product.image}" alt="${product.name}" class="product-image">
+                    <div>${product.name}</div>
+                </div>
+                <div>${product.category}</div>
+                <div>${product.size}</div>
+                <div>₱${product.price}</div>
+                <div>
+                    <button class="edit-btn">Edit</button>
+                    <button class="delete-btn">Delete</button>
+                    <button class="stock-btn ${stockBtnClass}">${stockBtnText}</button>
+                </div>
+            `;
+            productList.appendChild(productItem);
         });
+
+        // Reset select all checkbox when products are reloaded
+        selectAllCheckbox.checked = false;
+        updateSelectedCount();
+    }
+
+    // Toggle Stock Status Function based on product ID
+    function toggleStockStatus(productId) {
+        let products = JSON.parse(localStorage.getItem('products')) || [];
+        
+        const product = products.find(p => p.id === productId);  // Find product by unique ID
+        if (product) {
+            product.inStock = !product.inStock;  // Toggle stock status
+            localStorage.setItem('products', JSON.stringify(products));  // Update localStorage
+            loadProducts();  // Reload the product list to reflect changes
+        }
+    }
+
+    // Delete single product based on product ID
+    function deleteProduct(productId) {
+        let products = JSON.parse(localStorage.getItem('products')) || [];
+        products = products.filter(product => product.id !== productId);  // Filter out product by ID
+        localStorage.setItem('products', JSON.stringify(products));  // Save updated products list
+        loadProducts();  // Reload product list
+        updateSelectedCount();  // Update selection count
+    }
+
+    // Delete multiple products function
+    function deleteMultipleProducts() {
+        let products = JSON.parse(localStorage.getItem('products')) || [];
+        const checkboxes = Array.from(productList.querySelectorAll('.product-checkbox:checked'));
+
+        // Get the product IDs to delete
+        const idsToDelete = checkboxes
+            .map(checkbox => parseInt(checkbox.closest('.product-item').dataset.productId))
+            .sort((a, b) => b - a); // Sort IDs in descending order to avoid index shifting
+
+        // Remove products by their unique IDs
+        idsToDelete.forEach(id => {
+            products = products.filter(product => product.id !== id);  // Filter out product by ID
+        });
+
+        localStorage.setItem('products', JSON.stringify(products));  // Save updated list
+        loadProducts();  // Reload the product list
+        updateSelectedCount();  // Update selection count
+    }
+
+    // Event delegation for product list actions
+    productList.addEventListener('click', function (event) {
+        const target = event.target;
+        const productItem = target.closest('.product-item');
+        const productId = productItem ? parseInt(productItem.dataset.productId) : null;
+
+        if (target.classList.contains('edit-btn')) {
+            openEditModal(productId);
+        } else if (target.classList.contains('delete-btn')) {
+            deleteProduct(productId);  // Delete based on unique ID
+        } else if (target.classList.contains('stock-btn')) {
+            toggleStockStatus(productId);  // Toggle stock based on unique ID
+        } else if (target.classList.contains('product-checkbox')) {
+            updateSelectedCount();  // Update selected count
+        }
+    });
+
+    // Open Edit Modal
+    function openEditModal(productId) {
+        const products = JSON.parse(localStorage.getItem('products')) || [];
+        const product = products.find(p => p.id === productId);  // Find product by ID
+
+        if (product) {
+            // Populate the form with product details
+            document.getElementById('editName').value = product.name;
+            document.getElementById('editCategory').value = product.category;
+            document.getElementById('editSize').value = product.size;
+            document.getElementById('editPrice').value = product.price;
+
+            // Save the productId in the form as a data attribute
+            editModal.querySelector('form').dataset.productId = productId;
+
+            // Show modal
+            editModal.style.display = 'block';
+        }
+    }
+
+    // Handle form submission (Save Changes)
+    saveButton.addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const products = JSON.parse(localStorage.getItem('products')) || [];
+        const productId = editModal.querySelector('form').dataset.productId;
+
+        const product = products.find(p => p.id === productId);  // Find product by ID
+        if (product) {
+            // Update product details
+            product.name = document.getElementById('editName').value;
+            product.category = document.getElementById('editCategory').value;
+            product.size = document.getElementById('editSize').value;
+            product.price = document.getElementById('editPrice').value;
+
+            // Save to localStorage
+            localStorage.setItem('products', JSON.stringify(products));
+
+            // Close modal and reload products
+            loadProducts();
+            closeModal();
+        }
+    });
+
+    // Close the modal
+    function closeModal() {
+        editModal.style.display = 'none';
+    }
+
+    // Close button (Cancel)
+    closeButton.addEventListener('click', closeModal);
+
+    closeBtn.addEventListener('click', function() {
+        window.location.href = 'sellerDash.html';
+    });
+
+    // Select all checkboxes
+    selectAllCheckbox.addEventListener('change', function () {
+        const checkboxes = productList.querySelectorAll('.product-checkbox');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+        updateSelectedCount();
+    });
+
+    // Update selected count and show/hide delete button
+    function updateSelectedCount() {
+        const checkedBoxes = productList.querySelectorAll('.product-checkbox:checked');
+        const selectedCountElement = document.getElementById('selectedCount');
+        const deleteSection = document.querySelector('.delete-section');
+        const deleteSelectedBtn = document.getElementById('deleteSelected');
+
+        selectedCountElement.textContent = checkedBoxes.length;
+        deleteSection.style.display = checkedBoxes.length > 0 ? 'flex' : 'none';
+        deleteSelectedBtn.disabled = checkedBoxes.length === 0;
+    }
+
+    // Delete selected products
+    deleteSelected.addEventListener('click', deleteMultipleProducts);
+
+    // Initial load of products
+    loadProducts();
+});
+
     </script>
 </body>
 </html>

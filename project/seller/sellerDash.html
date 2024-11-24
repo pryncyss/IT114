@@ -234,7 +234,7 @@ body {
 /* Product Card Styles */
 .productCard {
     width: 220px; /* Fixed width */
-    height: 320px; /* Fixed height */
+    height: 330px; /* Fixed height */
     padding: 1rem;
     border-radius: 12px;
     text-align: center;
@@ -295,6 +295,24 @@ body {
     color: #08B6D9;
     font-weight: bold;
 }
+
+.productCard .stock {
+  text-align: end;
+  right: 10px;
+  font-size: 10px;
+  font-weight: bold;
+}
+.stock-available {
+    color: green;
+    font-weight: bold;
+}
+
+.stock-unavailable {
+    color: red;
+    font-weight: bold;
+}
+
+
 
 #logout-btn {
     width: 100%;
@@ -561,74 +579,25 @@ body {
             <!-- Search Bar -->
             <header class="header">
                 <div class="search-bar">
-                    <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Search">
+                  <i class="fas fa-search"></i>
+                  <input type="text" placeholder="Search">
                 </div>
                 <div class="header-icons">
-                    <button class="icon-btn" id="notification-btn">
-                        <i class="fas fa-bell"></i>
-                        <span class="notification-badge">3</span>
-                        <div class="dropdown" id="notification-dropdown">
-                            <div class="dropdown-header">Notifications</div>
-                            <div class="dropdown-content">
-                                <div class="dropdown-item unread">
-                                    <strong>New Order!</strong>
-                                    <p>Daniel Cervantes ordered Bangus</p>
-                                    <small>2 minutes ago</small>
-                                </div>
-                                <div class="dropdown-item unread">
-                                    <strong>New Review</strong>
-                                    <p>John Doe left a 5-star review on MacBook Air</p>
-                                    <small>15 minutes ago</small>
-                                </div>
-                                <div class="dropdown-item unread">
-                                    <strong>New Order!</strong>
-                                    <p>France Cantano ordered White Leg Shrimp</p>
-                                    <small>25 minutes ago</small>
-                                </div>
-                            </div>
-                        </div>
-                    </button>
-                    <button class="icon-btn" id="message-btn">
-                        <i class="fas fa-message"></i>
-                        <span class="notification-badge">2</span>
-                        <div class="dropdown" id="message-dropdown">
-                            <div class="dropdown-header">Messages</div>
-                            <div class="dropdown-content">
-                                <div class="dropdown-item unread">
-                                    <strong>Cindy Estrobo</strong>
-                                    <p>Is the Blue Crab still in stock?</p>
-                                    <small>5 minutes ago</small>
-                                </div>
-                                <div class="dropdown-item unread">
-                                    <strong>Shiba Garcia</strong>
-                                    <p>When will the Tilapia be available?</p>
-                                    <small>18 minutes ago</small>
-                                </div>
-                                <div class="dropdown-item unread">
-                                    <strong>Daniel Cervantes</strong>
-                                    <p>When will the Tilapia be available?</p>
-                                    <small>30 minutes ago</small>
-                                </div>
-                            </div>
-                        </div>
-                    </button>
-                    <button class="icon-btn" id="user-info-btn">
-                        <i class="fas fa-user"></i>
-                        <div class="dropdown" id="user-dropdown">
-                            <div class="dropdown-header">User Information</div>
-                            <div class="user-info">
-                                <img src="../images/user.png" alt="User Avatar">
-                                <div>
-                                    <h4>AQUAMARKET TEAM</h4>
-                                    <p>aquamarket@gmail.com</p>
-                                    <p>Seller</p>
-                                </div>
-                            </div>
-                        </div>
-                    </button>
+                  <!-- Notification Icon -->
+                  <button class="icon-btn">
+                    <i class="fas fa-bell"></i>
+                  </button>
+                  <!-- Message Icon -->
+                  <button class="icon-btn">
+                    <i class="fas fa-message"></i>
+                  </button>
+                  <!-- User Info Icon -->
+                  <button class="icon-btn" onclick="window.location.href='../seller/user-info.html';">
+                    <i class="fas fa-user"></i>
+                  </button>
                 </div>
-            </header>        
+              </header>
+              
             <!-- Sales Summary -->
             <section class="sales-summary">
                 <h2>Sales Summary</h2>
@@ -670,93 +639,6 @@ body {
         </main>
     </div>
     <script>
-      document.addEventListener('DOMContentLoaded', () => {
-    const notificationBtn = document.getElementById('notification-btn');
-    const messageBtn = document.getElementById('message-btn');
-    const userInfoBtn = document.getElementById('user-info-btn');
-
-    const notificationPopup = document.getElementById('notification-popup');
-    const messagePopup = document.getElementById('message-popup');
-    const userInfoPopup = document.getElementById('user-info-popup');
-
-    const buttons = [notificationBtn, messageBtn, userInfoBtn];
-    const popups = [notificationPopup, messagePopup, userInfoPopup];
-
-    buttons.forEach((btn, index) => {
-        btn.addEventListener('click', (e) => {
-            const popup = popups[index];
-            togglePopup(popup, btn);
-        });
-    });
-    
-
-    function togglePopup(popup, button) {
-        const isActive = popup.classList.contains('active');
-
-        // Close all popups
-        popups.forEach(p => p.classList.remove('active'));
-
-        if (!isActive) {
-            // Position popup relative to the button
-            const buttonRect = button.getBoundingClientRect();
-            const popupWidth = popup.offsetWidth;
-
-            popup.style.top = `${buttonRect.bottom + window.scrollY}px`;
-
-            // Center the popup under the button
-            const leftPosition = buttonRect.left + buttonRect.width / 2 - popupWidth / 2;
-
-            // Ensure popup doesn't overflow on small screens
-            popup.style.left = `${Math.max(10, Math.min(leftPosition, window.innerWidth - popupWidth - 10))}px`;
-
-            popup.classList.add('active');
-        }
-    }
-
-    // Close popups when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.icon-btn') && !e.target.closest('.popup-container')) {
-            popups.forEach(p => p.classList.remove('active'));
-        }
-    });
-});
-
-        // Add this JavaScript to enable swipe functionality
-let touchStartX = 0;
-let touchEndX = 0;
-
-document.querySelector('.products-grid').addEventListener('touchstart', e => {
-    touchStartX = e.changedTouches[0].screenX;
-});
-
-document.querySelector('.products-grid').addEventListener('touchend', e => {
-    touchEndX = e.changedTouches[0].screenX;
-    handleSwipe();
-});
-
-function handleSwipe() {
-    const container = document.querySelector('.products-grid');
-    const swipeThreshold = 50;
-    const scrollAmount = 300;
-    const diff = touchEndX - touchStartX;
-    
-    if (Math.abs(diff) > swipeThreshold) {
-        if (diff > 0) {
-            // Swipe right
-            container.scrollBy({
-                left: -scrollAmount,
-                behavior: 'smooth'
-            });
-        } else {
-            // Swipe left
-            container.scrollBy({
-                left: scrollAmount,
-                behavior: 'smooth'
-            });
-        }
-    }
-}
-
 document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.querySelector('.search-bar input');
     const searchResultsContainer = document.createElement('div');
@@ -931,16 +813,19 @@ document.addEventListener('DOMContentLoaded', () => {
         products.forEach(product => {
             const productCard = document.createElement('div');
             productCard.classList.add('productCard');
+            const stockClass = product.inStock ? 'stock-available' : 'stock-unavailable';
+        const stockText = product.inStock ? 'In Stock' : 'Out of Stock';
+        const stockColor = product.inStock ? '#28a745' : '#dc3545'; // Green or Red
 
-            productCard.innerHTML = `
+        productCard.innerHTML = `
             <div class="image-wrapper">
                 <img src="${product.image || 'default-image.jpg'}" alt="${product.name}" />
             </div>
-                <h3>${product.name}</h3>
-                <p>${product.size}</p>
-                <p class="price">₱${product.price}/KG</p>
-            `;
-
+            <h3>${product.name}</h3>
+            <p>${product.size}</p>
+            <p class="price">₱${product.price}/KG</p>
+            <p class="stock ${stockClass}" style="color: ${stockColor}; font-weight: bold;">${stockText}</p>
+        `;
             productsGrid.appendChild(productCard);
         });
 
@@ -948,6 +833,61 @@ document.addEventListener('DOMContentLoaded', () => {
             productsGrid.innerHTML = '<p>No products available. Add some products to see them here!</p>';
         }
     });
+
+    // Event listener for stock button
+productList.addEventListener('click', (e) => {
+    if (e.target.classList.contains('stock-btn')) {
+        const productId = parseInt(e.target.closest('.product-item').dataset.productId, 10);
+        toggleStockStatus(productId);
+        refreshProductCards(); // Update the product cards to reflect the new stock status
+    }
+});
+
+// Toggle Stock Status Function based on product ID
+function toggleStockStatus(productId) {
+    let products = JSON.parse(localStorage.getItem('products')) || [];
+
+    // Find and toggle the stock status
+    const product = products.find(p => p.id === productId);
+    if (product) {
+        product.inStock = !product.inStock;
+        product.stock = product.inStock ? 10 : 0; // Example logic for updating stock count
+        localStorage.setItem('products', JSON.stringify(products));
+        refreshProductCards(); // Re-render cards to reflect the change
+    }
+}
+
+
+// Function to refresh the product cards
+function refreshProductCards() {
+    const products = JSON.parse(localStorage.getItem('products')) || [];
+    const productsGrid = document.querySelector('.products-grid');
+    productsGrid.innerHTML = ''; // Clear current cards
+
+    products.forEach(product => {
+        const productCard = document.createElement('div');
+        productCard.classList.add('productCard');
+
+        // Determine stock status and assign the color directly
+        const stockClass = product.inStock ? 'stock-available' : 'stock-unavailable';
+        const stockText = product.inStock ? 'In Stock' : 'Out of Stock';
+        const stockColor = product.inStock ? '#28a745' : '#dc3545'; // Green or Red
+
+        productCard.innerHTML = `
+            <div class="image-wrapper">
+                <img src="${product.image || 'default-image.jpg'}" alt="${product.name}" />
+            </div>
+            <h3>${product.name}</h3>
+            <p>${product.size}</p>
+            <p class="price">₱${product.price}/KG</p>
+            <p class="stock ${stockClass}" style="color: ${stockColor}; font-weight: bold;">${stockText}</p>
+        `;
+
+        productsGrid.appendChild(productCard);
+    });
+}
+
+
 
         function toggleMenu() {
     const sidebar = document.getElementById('sidebar');
@@ -958,58 +898,7 @@ function redirectToLogin() {
     window.location.href = '../login/loginSeller.html'; 
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-            const buttons = {
-                notification: document.getElementById('notification-btn'),
-                message: document.getElementById('message-btn'),
-                userInfo: document.getElementById('user-info-btn')
-            };
 
-            const dropdowns = {
-                notification: document.getElementById('notification-dropdown'),
-                message: document.getElementById('message-dropdown'),
-                userInfo: document.getElementById('user-dropdown')
-            };
-
-            // Function to close all dropdowns
-            function closeAllDropdowns() {
-                Object.values(dropdowns).forEach(dropdown => {
-                    dropdown.style.display = 'none';
-                });
-            }
-
-            // Handle button clicks
-            Object.keys(buttons).forEach(key => {
-                buttons[key].addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    const dropdown = dropdowns[key];
-                    const isVisible = dropdown.style.display === 'block';
-                    
-                    closeAllDropdowns();
-                    
-                    if (!isVisible) {
-                        dropdown.style.display = 'block';
-                        
-                        // Clear notification badge when opened
-                        const badge = this.querySelector('.notification-badge');
-                        if (badge) {
-                            badge.style.display = 'none';
-                        }
-                        
-                        // Mark items as read
-                        const unreadItems = dropdown.querySelectorAll('.unread');
-                        unreadItems.forEach(item => {
-                            item.classList.remove('unread');
-                        });
-                    }
-                });
-            });
-
-            // Close dropdowns when clicking outside
-            document.addEventListener('click', function() {
-                closeAllDropdowns();
-            });
-        });
     </script>
 </body>
 </html>

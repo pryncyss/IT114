@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <title>Aquamarket Products</title>
+  <link rel="stylesheet" href="buyer.css">
+</head>
+<body>
+  <div class="header">
+    <div class="logo-container">
+      <img src="../images/logo.png" alt="Logo" class="logo">
+      <h1 class="logo-text">AQUAMARKET</h1>
+    </div>
+
+    <div class="search-bar">
+      <i class="fas fa-search"></i>
+      <input type="text" placeholder="Search">
+    </div>
+
+    <div class="header-icons">
+        <button class="icon-btn"onclick="window.location.href='shopping-cart.html';"><i class="fas fa-shopping-cart"></i></button>
+        <button class="icon-btn"><i class="fas fa-bell"></i></button>
+
+      <!-- Dropdown Container -->
+      <div class="dropdown">
+        <button class="user-icon"><i class="fas fa-user"></i></button>
+        <div class="dropdown-content">
+          <a href="user-info.html">Profile</a>
+          <a href="settings.html">Settings</a>
+          <a id="logoutBtn">Logout</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <section class="products-section">
+    <div class="container">
+    <h2>Products</h2>
+
+    <div class="category-buttons">
+        <button class="category-btn" data-category="all">All</button>
+        <button class="category-btn" data-category="fish">Fish</button>
+        <button class="category-btn" data-category="shrimp-prawns">Shrimp & Prawns</button>
+        <button class="category-btn" data-category="seaweeds">Seaweeds</button>
+        <button class="category-btn" data-category="crabs-shells">Crabs</button>
+        <button class="category-btn" data-category="crabs-shells">Shells</button>
+      </div>
+
+      <div class="products-grid">
+        <!-- Products will be inserted here by JavaScript -->
+      </div>
+      </div>
+    </section>
+  
+    <div id="productModal" class="modal">
+      <div class="modal-content">
+        <span id="closeModal" class="close-btn">&times;</span>
+        
+        <!-- Left Section: Name and Image -->
+        <div class="modal-left">
+          <h2 id="productTitle" class="product-title">Product Name</h2>
+          <img id="productImage" class="product-image" src="" alt="Product Image">
+        </div>
+    
+        <!-- Right Section: Description, Price, and Controls -->
+        <div class="modal-right">
+          <p id="productDescription" class="product-description">Description of the product</p>
+          <p id="productPrice" class="product-price">Price: ₱0.00</p>
+          
+          <div class="quantity-control">
+            <button id="decreaseQuantity" class="quantity-btn">-</button>
+            <input type="number" id="quantityInput" class="quantity-input" value="1" min="1">
+            <button id="increaseQuantity" class="quantity-btn">+</button>
+          </div>
+          
+          <div class="button-group">
+            <button id="addToCartBtn" class="add-to-cart-btn">Add to Cart</button>
+            <button id="BuyNow" class="buy-now-btn">Buy Now</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="shopping">
+      <a href="purchased.html">
+      <button class="icon-btn-right"><i class="fas fa-shopping-bag"></i></button>
+      </a>
+    </div>
+    
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const productsGrid = document.querySelector('.products-grid');
+        const categoryButtons = document.querySelectorAll('.category-btn');
+        const searchInput = document.querySelector('.search-bar input');
+    
+        // Sample Products
+        const products = JSON.parse(localStorage.getItem('products')) || [
+          { id: 1, name: 'Bangus', description: 'Fresh milkfish sourced from local fisheries', price: 250, image: 'bangus.jpg', category: 'Fish' },
+          { id: 2, name: 'Shrimp', description: 'Premium quality shrimp, directly from the sea', price: 400, image: 'shrimp.jpg', category: 'Seafood' },
+        ];
+    
+        class ProductModal {
+          constructor() {
+            this.modal = document.getElementById('productModal');
+            this.closeBtn = document.getElementById('closeModal');
+            this.quantityInput = document.getElementById('quantityInput');
+            this.decreaseBtn = document.getElementById('decreaseQuantity');
+            this.increaseBtn = document.getElementById('increaseQuantity');
+            this.addToCartBtn = document.getElementById('addToCartBtn');
+            this.buyNowBtn = document.getElementById('BuyNow'); // Add Buy Now button
+    
+            this.productTitleEl = document.getElementById('productTitle');
+            this.productImageEl = document.getElementById('productImage');
+            this.productDescriptionEl = document.getElementById('productDescription');
+            this.productPriceEl = document.getElementById('productPrice');
+    
+            this.currentProduct = null; // Track the current product in the modal
+    
+            this.bindEvents();
+          }
+    
+          bindEvents() {
+            this.closeBtn.addEventListener('click', () => this.close());
+            this.decreaseBtn.addEventListener('click', () => this.adjustQuantity(-1));
+            this.increaseBtn.addEventListener('click', () => this.adjustQuantity(1));
+            this.addToCartBtn.addEventListener('click', () => this.addToCart());
+            this.buyNowBtn.addEventListener('click', () => this.buyNow()); // Add event listener for Buy Now
+          }
+    
+          open(product) {
+    this.currentProduct = product;
+    this.updateContent(product);
+    this.modal.style.display = 'flex';
+
+    // Disable Add to Cart and Buy Now buttons if the product is out of stock
+    if (!product.inStock) {
+        this.addToCartBtn.disabled = true;
+        this.addToCartBtn.textContent = 'Out of Stock';
+        this.buyNowBtn.disabled = true;
+        this.buyNowBtn.textContent = 'Out of Stock';
+    } else {
+        this.addToCartBtn.disabled = false;
+        this.addToCartBtn.textContent = 'Add to Cart';
+        this.buyNowBtn.disabled = false;
+        this.buyNowBtn.textContent = 'Buy Now';
+    }
+}
+    
+          close() {
+            this.modal.style.display = 'none';
+          }
+    
+          updateContent(product) {
+            this.productTitleEl.textContent = product.name;
+            this.productImageEl.src = product.image || 'default-image.png';
+            this.productDescriptionEl.textContent = product.description;
+            this.productPriceEl.textContent = `₱${product.price}`;
+            this.quantityInput.value = 1; // Reset quantity
+          }
+    
+          adjustQuantity(change) {
+            const currentQuantity = parseInt(this.quantityInput.value, 10);
+            const newQuantity = currentQuantity + change;
+            if (newQuantity > 0) {
+              this.quantityInput.value = newQuantity;
+            }
+          }
+    
+          addToCart() {
+            const quantity = parseInt(this.quantityInput.value, 10);
+            const cartItem = {
+              id: this.currentProduct.id,
+              name: this.currentProduct.name,
+              price: this.currentProduct.price,
+              quantity,
+            };
+    
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const existingItem = cart.find((item) => item.id === this.currentProduct.id);
+            if (existingItem) {
+              existingItem.quantity += quantity;
+            } else {
+              cart.push(cartItem);
+            }
+            localStorage.setItem('cart', JSON.stringify(cart));
+    
+            alert(`${quantity} ${this.currentProduct.name}(s) added to cart!`);
+            this.close();
+          }
+    
+          // New method to handle Buy Now functionality
+          buyNow() {
+  const quantity = parseInt(this.quantityInput.value, 10);
+
+  // Ensure valid quantity
+  if (!quantity || quantity <= 0) {
+    alert("Please select a valid quantity!");
+    return;
+  }
+
+  // Product details
+  const cartItem = {
+    id: this.currentProduct.id,
+    name: this.currentProduct.name,
+    price: this.currentProduct.price,
+    quantity,
+  };
+
+  // Calculate total price
+  const totalPrice = cartItem.price * quantity;
+
+  // Retrieve user information
+  const user = JSON.parse(localStorage.getItem('user')) || {}; // Get user details
+  const tempAddress = sessionStorage.getItem('tempAddress') || user.address; // Temporary address
+  const tempPhone = sessionStorage.getItem('tempPhone') || user.phone; // Temporary phone
+
+  // Validate user details
+  if (!tempAddress || !tempPhone) {
+    alert("Please update your address and phone number before proceeding to checkout.");
+    return;
+  }
+
+  // Confirm purchase with an alert
+  const confirmPurchase = confirm(
+    `You are about to purchase:\n` +
+    `- Product: ${cartItem.name}\n` +
+    `- Quantity: ${quantity}\n` +
+    `- Total Price: ₱${totalPrice}\n\n` +
+    `Shipping To: ${tempAddress}\n` +
+    `Contact Number: ${tempPhone}\n\n` +
+    `Proceed to checkout?`
+  );
+
+  if (!confirmPurchase) {
+    return; // Exit if user cancels the purchase
+  }
+
+  // Simulate a checkout process by saving the order
+  const orders = JSON.parse(localStorage.getItem('orders')) || [];
+  const newOrder = {
+    id: `order-${Date.now()}`, // Unique order ID
+    buyerName: user.name || 'Anonymous', // User name or 'Anonymous'
+    buyerEmail: user.email || 'Not Provided', // User email or placeholder
+    buyerAddress: tempAddress, // User's address
+    buyerPhone: tempPhone, // User's phone number
+    items: [cartItem], // Ordered items
+    total: totalPrice, // Total amount
+    date: new Date().toISOString(), // Order date
+    status: 'Purchased', // Order status
+  };
+
+  orders.push(newOrder);
+  localStorage.setItem('orders', JSON.stringify(orders)); // Save the order to localStorage
+
+  // Clear the cart (if Buy Now bypasses the cart process)
+  localStorage.setItem('cart', JSON.stringify([]));
+
+  // Redirect to a checkout success page
+  window.location.href = '../buyer/checkout-success.html';
+}
+
+        }
+    
+        // Initialize the modal
+        const productModal = new ProductModal();
+    
+        // Render products
+        function renderProducts({ category = 'all', searchQuery = '' } = {}) {
+  productsGrid.innerHTML = ''; // Clear the grid
+
+  // Filter products based on category and search query
+  let filteredProducts = products;
+
+  if (category !== 'all') {
+    filteredProducts = filteredProducts.filter(product =>
+      product.category.toLowerCase() === category.toLowerCase()
+    );
+  }
+
+  if (searchQuery) {
+    filteredProducts = filteredProducts.filter(product =>
+      product.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }
+
+  // Display appropriate message based on filtering context
+  if (filteredProducts.length === 0) {
+    const noResultsMessage = document.createElement('div');
+    noResultsMessage.classList.add('no-products-message');
+
+    if (searchQuery) {
+      noResultsMessage.textContent = 'No products match your search.';
+    } else {
+      noResultsMessage.textContent = `No products displayed in this category.`;
+    }
+
+    productsGrid.appendChild(noResultsMessage);
+    return;
+  }
+
+  // Render the filtered products
+  filteredProducts.forEach(product => {
+    const productCard = document.createElement('div');
+    productCard.classList.add('productCard');
+    productCard.dataset.id = product.id;
+
+    const stockClass = product.inStock ? 'stock-available' : 'stock-unavailable';
+    const stockText = product.inStock ? 'In Stock' : 'Out of Stock';
+    const stockColor = product.inStock ? '#28a745' : '#dc3545';
+
+    productCard.innerHTML = `
+      <div class="image-wrapper">
+        <img src="${product.image || 'default-image.jpg'}" alt="${product.name}" />
+      </div>
+      <h3>${product.name}</h3>
+      <p>${product.size || ''}</p>
+      <p class="price">₱${product.price}/KG</p>
+      <p class="stock ${stockClass}" style="color: ${stockColor}; font-weight: bold;">${stockText}</p>
+    `;
+
+    productCard.addEventListener('click', () => productModal.open(product));
+    productsGrid.appendChild(productCard);
+  });
+}
+
+categoryButtons.forEach(button => {
+  button.addEventListener('click', () => {
+    const category = button.dataset.category;
+    categoryButtons.forEach(btn => btn.classList.remove('active'));
+    button.classList.add('active');
+    renderProducts({ category, searchQuery: searchInput.value.trim() });
+  });
+});
+searchInput.addEventListener('input', (e) => {
+  const searchQuery = e.target.value.trim();
+  const activeCategory = document.querySelector('.category-btn.active')?.dataset.category || 'all';
+  renderProducts({ category: activeCategory, searchQuery });
+});
+
+
+
+document.getElementById('logoutBtn').addEventListener('click', () => {
+  localStorage.removeItem('currentUserEmail');
+  alert('You have been logged out.');
+  window.location.href = '../login/loginBuyer.html'; // Redirect to login page
+});
+
+
+    
+        // Initial render
+        renderProducts();
+      });
+    </script>
+    
+        
+</body>
+</html>

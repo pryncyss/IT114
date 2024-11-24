@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <title>Register</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      width: 60%;
+      margin: 0 auto;
+      padding-top: 50px;
+    }
+    .form-container {
+        background: linear-gradient(to top, #0d0d36 40%, #000);
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+    }
+    h2 {
+      text-align: center;
+      color: #fff;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    .form-group label {
+      font-size: 16px;
+      color: #fff;
+    }
+    .form-group input,
+    .form-group select {
+        color: #fff;
+      background: none;
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border: 2px solid #08B6D9;
+      border-radius: 15px;
+      box-sizing: border-box;
+    }
+    .form-group input[type="radio"] {
+      width: auto;
+      margin-right: 10px;
+    }
+    .form-group .role-label {
+      margin-right: 15px;
+    }
+    .form-group button {
+      background-color: #00b0ff;
+      color: white;
+      padding: 12px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 100%;
+    }
+    .form-group button:hover {
+      background-color: #0095d1;
+    }
+    .error-message {
+      color: red;
+      font-size: 14px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="form-container">
+      <h2>Create an Account</h2>
+      <form id="registerForm">
+        <!-- Full Name -->
+        <div class="form-group">
+          <label for="name">Full Name:</label>
+          <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+        </div>
+        
+        <!-- Email Address -->
+        <div class="form-group">
+          <label for="email">Email Address:</label>
+          <input type="email" id="email" name="email" placeholder="Enter your email" required>
+        </div>
+
+        <!-- Address -->
+        <div class="form-group">
+          <label for="address">Address:</label>
+          <input type="address" id="address" name="address" placeholder="Enter your address" required>
+        </div>
+
+        <!-- Phone Number -->
+        <div class="form-group">
+          <label for="phone">Phone Number:</label>
+          <input type="phone" id="phone" name="phone" placeholder="Enter your phone number" required>
+        </div>
+        
+        <!-- Password -->
+        <div class="form-group">
+          <label for="password">Password:</label>
+          <input type="password" id="password" name="password" placeholder="Enter your password" required>
+        </div>
+        
+        <!-- Confirm Password -->
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password:</label>
+          <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required>
+        </div>
+
+        <!-- Role -->
+        <div class="form-group">
+          <label>Role:</label>
+          <div class="role-options">
+            <label class="role-label">
+              <input type="radio" name="role" value="buyer" required> Buyer
+            </label>
+            <label class="role-label">
+              <input type="radio" name="role" value="seller" required> Seller
+            </label>
+          </div>
+        </div>
+        
+        <!-- Submit Button -->
+        <div class="form-group">
+          <button type="submit">Register</button>
+        </div>
+        
+        <!-- Error Message -->
+        <div id="error-message" class="error-message">
+          <p>Passwords do not match. Please try again.</p>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('registerForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      // Get form values
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const address = document.getElementById('address').value;  // Make sure to get address
+      const phone = document.getElementById('phone').value;      // Make sure to get phone
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      const role = document.querySelector('input[name="role"]:checked')?.value;
+
+       // Check if passwords match
+    if (password !== confirmPassword) {
+        document.getElementById('error-message').style.display = 'block';
+        return;
+    }
+
+    // Get existing users array from localStorage
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+
+    // Check if email already exists
+    if (users.some(user => user.email === email)) {
+        alert('Email already registered. Please use a different email.');
+        return;
+    }
+
+    // Create new user object
+    const newUser = {
+        name,
+        email,
+        address,
+        phone,
+        password,
+        role
+    };
+
+    // Add new user to array
+    users.push(newUser);
+
+    // Save updated users array back to localStorage
+    localStorage.setItem('users', JSON.stringify(users));
+
+    // Store current user email for session management
+    localStorage.setItem('currentUserEmail', email);
+
+    // Redirect based on role
+    alert('Registration successful!');
+    if (role === 'buyer') {
+        window.location.href = '../login/loginBuyer.html';
+    } else if (role === 'seller') {
+        window.location.href = '../login/loginSeller.html';
+    }
+});
+  </script>
+
+</body>
+</html>
