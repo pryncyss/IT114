@@ -345,15 +345,26 @@ body {
         let currentProduct = null;
 
         // Initialize products
-        function initializeProducts() {
-            const productList = document.getElementById('productList');
-            productList.innerHTML = '';
+        // Initialize products (only products with reviews)
+function initializeProducts() {
+    const productList = document.getElementById('productList');
+    productList.innerHTML = '';
 
-            products.forEach(product => {
-                const productCard = createProductCard(product);
-                productList.appendChild(productCard);
-            });
-        }
+    // Filter products to include only those with reviews
+    const reviewedProducts = products.filter(product => product.reviews && product.reviews.length > 0);
+
+    // Create product cards for products with reviews
+    reviewedProducts.forEach(product => {
+        const productCard = createProductCard(product);
+        productList.appendChild(productCard);
+    });
+
+    // Display a message if no products have reviews
+    if (reviewedProducts.length === 0) {
+        productList.innerHTML = '<p>No products have reviews yet.</p>';
+    }
+}
+
 
         // Create product card
         function createProductCard(product) {

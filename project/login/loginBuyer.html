@@ -33,31 +33,22 @@
   </div>
   
   <script>
-    document.getElementById('loginForm').addEventListener('submit', function(event) {
-      event.preventDefault();
-  
-      // Corrected input ID for username
-      const username = document.getElementById('username').value;
-      const password = document.getElementById('password').value;
-      const users = JSON.parse(localStorage.getItem('users')) || [];
-  
-      // Find the user
-      const user = users.find(user => user.email === username && user.password === password);
-  
-      if (user) {
-        // Save current user's email to localStorage for session management
-        localStorage.setItem('currentUserEmail', username);
-        // Check if the user role is 'Buyer'
-        if (user.role === 'buyer') {
-          alert('Login successful!');
-          window.location.href = '../buyer/buyerDash.html'; // Redirect to buyer dashboard
-        } else {
-          alert('Invalid credentials: You are not a buyer.');
-        }
-      } else {
-        alert('Invalid credentials: Username or password is incorrect.');
-      }
-    });
+    document.getElementById('loginForm').addEventListener('submit', function (event) {
+  event.preventDefault();
+
+  const username = document.getElementById('username').value;
+  const password = document.getElementById('password').value;
+  const users = JSON.parse(localStorage.getItem('users')) || [];
+  const user = users.find(user => user.email === username && user.password === password && user.role === 'buyer');
+
+  if (user) {
+    localStorage.setItem('currentBuyerId', user.id);
+    window.location.href = '../buyer/buyerDash.html';
+  } else {
+    alert('Invalid credentials.');
+  }
+});
+
   </script>
   
 </body>

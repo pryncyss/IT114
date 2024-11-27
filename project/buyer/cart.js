@@ -1,33 +1,33 @@
 document.addEventListener('DOMContentLoaded', () => {
   renderCart(); // Render the cart initially
   
-  // Handle checkout button click
-  document.getElementById('checkoutBtn').addEventListener('click', handleCheckout);
-
   // Pre-fill user information (if available)
-  const user = JSON.parse(localStorage.getItem('user')) || {};
-  const tempAddress = sessionStorage.getItem('tempAddress') || user.address;
-  const tempPhone = sessionStorage.getItem('tempPhone') || user.phone;
+  const currentBuyerId = localStorage.getItem('currentBuyerId');
+  const users = JSON.parse(localStorage.getItem('users')) || [];
+
+  currentUser = users.find(user => user.id === currentBuyerId);
+  const tempAddress = sessionStorage.getItem('tempAddress') || currentUser.address;
+  const tempPhone = sessionStorage.getItem('tempPhone') || currentUser.phone;
 
   // Set values to temporary address and phone if they exist
   const addressText = document.getElementById('addressText');
   const phoneText = document.getElementById('phoneText');
-  addressText.textContent = tempAddress || user.address || 'No Address Provided';
-  phoneText.textContent = tempPhone || user.phone || 'No Phone Number Provided';
+  addressText.textContent = tempAddress || 'No Address Provided';
+  phoneText.textContent = tempPhone || 'No Phone Number Provided';
 
   // Pre-fill input fields with session data or default user data
-  document.getElementById('userAddress').value = tempAddress || user.address || '';
-  document.getElementById('userPhone').value = tempPhone || user.phone || '';
+  document.getElementById('userAddress').value = tempAddress || '';
+  document.getElementById('userPhone').value = tempPhone || '';
 
-  // Handle "Change Address" button click
-  document.getElementById('changeAddressBtn').addEventListener('click', () => {
+  // Handle "Change Address" link click
+  document.getElementById('changeAddressText').addEventListener('click', () => {
     addressText.style.display = 'none';
     document.getElementById('userAddress').style.display = 'inline-block';
     document.getElementById('saveAddressBtn').style.display = 'inline-block';
   });
 
-  // Handle "Change Phone Number" button click
-  document.getElementById('changePhoneBtn').addEventListener('click', () => {
+  // Handle "Change Phone Number" link click
+  document.getElementById('changePhoneText').addEventListener('click', () => {
     phoneText.style.display = 'none';
     document.getElementById('userPhone').style.display = 'inline-block';
     document.getElementById('savePhoneBtn').style.display = 'inline-block';
@@ -58,91 +58,180 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// Function to render the cart items (from previous code)
-function renderCart() {
-  const cartItemsContainer = document.getElementById('cartItems');
-  const cartTotalEl = document.getElementById('cartTotal');
-  const cart = JSON.parse(localStorage.getItem('cart')) || [];
-
-  cartItemsContainer.innerHTML = ''; // Clear the cart display
-
-  if (cart.length === 0) {
-    // Show message if the cart is empty
-    const noItemsMessage = document.createElement('div');
-    noItemsMessage.classList.add('no-items-message');
-    noItemsMessage.textContent = 'No available products in your cart';
-    cartItemsContainer.appendChild(noItemsMessage);
-
-    cartTotalEl.textContent = '₱0.00'; // Set total to 0 if cart is empty
-    return; // Exit function if no items in the cart
+function calculateTotal() {
+  const currentBuyerId = localStorage.getItem('currentBuyerId');
+  if (!currentBuyerId) {
+    alert('Please log in to view your cart.');
+    return;
   }
 
-  let defaultTotal = 0; // Total of all items in the cart
+  const cartKey = `cart_${currentBuyerId}`;
+  const cart = JSON.parse(localStorage.getItem(cartKey)) || [];
+  let total = 0;
 
-  // Render each cart item
-  cart.forEach((item) => {
-    const cartItemElement = document.createElement('div');
-    cartItemElement.classList.add('cart-item');
-    cartItemElement.innerHTML = `
-      <div class="cart-item-image">
-        <img src="${item.image || 'default-image.png'}" alt="${item.name}">
-      </div>
-      <div class="cart-item-details">
-        <h4>${item.name}</h4>
-        <p>₱${item.price}</p>
-        <div>
-          <button class="decrease-quantity" data-id="${item.id}">-</button>
-          <span class="item-quantity">${item.quantity}</span>
-          <button class="increase-quantity" data-id="${item.id}">+</button>
-        </div>
-      </div>
-      <div class="cart-item-actions">
-        <button class="remove-item" data-id="${item.id}">Remove</button>
-        <input type="checkbox" class="select-item" data-id="${item.id}">
-      </div>
-    `;
-    cartItemsContainer.appendChild(cartItemElement);
+  const selectedCheckboxes = document.querySelectorAll('.select-item:checked');
+  console.log('Selected Checkboxes:', selectedCheckboxes); // Debug log
 
-    // Add event listener for removing items from the cart
-    cartItemElement.querySelector('.remove-item').addEventListener('click', () => {
-      removeFromCart(item.id);
-    });
+  selectedCheckboxes.forEach((checkbox) => {
+    const itemId = checkbox.dataset.id;
+    const seller = checkbox.dataset.seller;
 
-    // Add event listeners for increasing or decreasing quantity
-    cartItemElement.querySelector('.decrease-quantity').addEventListener('click', () => {
-      updateCartItemQuantity(item.id, item.quantity - 1);
-    });
-    cartItemElement.querySelector('.increase-quantity').addEventListener('click', () => {
-      updateCartItemQuantity(item.id, item.quantity + 1);
-    });
+    const item = cart.find(cartItem => cartItem.id === itemId && cartItem.seller === seller);
+    console.log('Selected Item:', item); // Debug log
 
-    // Calculate default total price
-    defaultTotal += item.price * item.quantity;
+    if (item) {
+      total += item.price * item.quantity; // Multiply by item.quantity to account for multiple quantities
+    }
   });
 
-  cartTotalEl.textContent = defaultTotal.toFixed(2); // Display total initially
+  console.log('Calculated Total:', total); // Debug log
+  const cartTotalEl = document.getElementById('cartTotal');
+  cartTotalEl.textContent = `₱${total.toFixed(2)}`;
 }
 
+
+
+// Function to render the cart items (from previous code)
+function renderCart() {
+  const currentBuyerId = localStorage.getItem('currentBuyerId');
+  if (!currentBuyerId) {
+    alert('Please log in to view your cart.');
+    return;
+  }
+
+  const cartKey = `cart_${currentBuyerId}`;
+  const cart = JSON.parse(localStorage.getItem(cartKey)) || [];
+  const cartItemsContainer = document.getElementById('cartItems');
+  const cartTotalEl = document.getElementById('cartTotal');
+
+  cartItemsContainer.innerHTML = ''; // Clear the cart content
+
+  if (cart.length === 0) {
+    cartItemsContainer.innerHTML = '<p>No items in the cart.</p>';
+    cartTotalEl.textContent = '₱0.00';
+    return;
+  }
+
+  // Group items by seller
+  const groupedBySeller = cart.reduce((acc, item) => {
+    if (!acc[item.seller]) {
+      acc[item.seller] = [];
+    }
+    acc[item.seller].push(item);
+    return acc;
+  }, {});
+
+  let totalPrice = 0;
+
+  Object.keys(groupedBySeller).forEach(seller => {
+    // Create a container for each seller
+    const sellerContainer = document.createElement('div');
+    sellerContainer.classList.add('seller-section');
+
+    // Add seller name or ID at the top
+    const sellerName = document.createElement('h3');
+    sellerName.classList.add('seller-name');
+    sellerName.textContent = `Seller: ${seller}`;
+    sellerContainer.appendChild(sellerName);
+
+    // Add products for the seller
+    groupedBySeller[seller].forEach(item => {
+      const cartItemElement = document.createElement('div');
+      cartItemElement.classList.add('cart-item');
+      cartItemElement.innerHTML = `
+          <input type="checkbox" class="select-item" data-id="${item.id}" data-seller="${item.seller}">
+          <div class="cart-item-image">
+              <img src="${item.image || 'default-image.png'}" alt="${item.name}">
+          </div>
+          <div class="cart-item-details">
+              <h4>${item.name}</h4>
+              <p>Price: ₱${item.price}</p>
+          </div>
+          <div class="cart-item-controls">
+              <button class="decrease-quantity">-</button>
+              <span class="item-quantity">${item.quantity}</span>
+              <button class="increase-quantity">+</button>
+          </div>
+          <div class="cart-item-actions">
+              <button class="remove-item">Remove</button>
+          </div>
+      `;
+      totalPrice += item.price * item.quantity;
+
+      // Attach event listeners for buttons
+      const decreaseBtn = cartItemElement.querySelector('.decrease-quantity');
+      const increaseBtn = cartItemElement.querySelector('.increase-quantity');
+      const removeBtn = cartItemElement.querySelector('.remove-item');
+      const checkbox = cartItemElement.querySelector('.select-item');
+
+      decreaseBtn.addEventListener('click', () => {
+        updateCartItemQuantity(item.id, item.seller, -1);
+      });
+
+      increaseBtn.addEventListener('click', () => {
+        updateCartItemQuantity(item.id, item.seller, 1);
+      });
+
+      removeBtn.addEventListener('click', () => {
+        removeFromCart(item.id, item.seller);
+      });
+
+      checkbox.addEventListener('change', calculateTotal);
+
+      sellerContainer.appendChild(cartItemElement);
+    });
+
+    // Append seller container to cart
+    cartItemsContainer.appendChild(sellerContainer);
+  });
+
+  cartTotalEl.textContent = `₱${totalPrice.toFixed(2)}`;
+}
+
+
+
+
+
+
 // Function to remove an item from the cart
-function removeFromCart(itemId) {
-  const cart = JSON.parse(localStorage.getItem('cart')) || [];
-  const updatedCart = cart.filter((item) => item.id !== itemId);
-  localStorage.setItem('cart', JSON.stringify(updatedCart));
+function removeFromCart(itemId, seller) {
+  const currentBuyerId = localStorage.getItem('currentBuyerId');
+  if (!currentBuyerId) return;
+
+  const cartKey = `cart_${currentBuyerId}`;
+  let cart = JSON.parse(localStorage.getItem(cartKey)) || [];
+
+  cart = cart.filter(item => !(item.id === itemId && item.seller === seller));
+
+  localStorage.setItem(cartKey, JSON.stringify(cart));
   renderCart(); // Re-render the cart
 }
 
+
+
+
 // Function to update item quantity in the cart
-function updateCartItemQuantity(itemId, newQuantity) {
-  const cart = JSON.parse(localStorage.getItem('cart')) || [];
-  const updatedCart = cart.map((item) => {
-    if (item.id === itemId) {
+function updateCartItemQuantity(itemId, seller, change) {
+  const currentBuyerId = localStorage.getItem('currentBuyerId');
+  if (!currentBuyerId) return;
+
+  const cartKey = `cart_${currentBuyerId}`;
+  let cart = JSON.parse(localStorage.getItem(cartKey)) || [];
+
+  cart = cart.map(item => {
+    if (item.id === itemId && item.seller === seller) {
+      const newQuantity = item.quantity + change;
       return { ...item, quantity: Math.max(1, newQuantity) }; // Ensure quantity is at least 1
     }
     return item;
   });
-  localStorage.setItem('cart', JSON.stringify(updatedCart));
+
+  localStorage.setItem(cartKey, JSON.stringify(cart));
   renderCart(); // Re-render the cart
 }
+
+
+
 
 
 function confirmPurchaseAlert(items, totalPrice, tempAddress, tempPhone) {
@@ -158,74 +247,104 @@ function confirmPurchaseAlert(items, totalPrice, tempAddress, tempPhone) {
   );
 }
 
+
+
 // Function to handle checkout selection
 function handleCheckout() {
-  const selectedItems = [];
-  const cart = JSON.parse(localStorage.getItem('cart')) || [];
-  const user = JSON.parse(localStorage.getItem('user')) || {}; // Retrieve user info from localStorage
+  const currentBuyerId = localStorage.getItem('currentBuyerId');
+  if (!currentBuyerId) {
+    alert('Please log in to proceed with checkout.');
+    return;
+  }
 
-  // Get all selected items
+  const cartKey = `cart_${currentBuyerId}`;
+  const cart = JSON.parse(localStorage.getItem(cartKey)) || [];
+  const users = JSON.parse(localStorage.getItem('users')) || [];
+  const currentUser = users.find(user => user.id === currentBuyerId);
+
+  if (!currentUser) {
+    alert('User not found. Please log in again.');
+    return;
+  }
+
+  const selectedItems = [];
   document.querySelectorAll('.select-item:checked').forEach((checkbox) => {
-    const itemId = parseInt(checkbox.dataset.id, 10);
-    const item = cart.find((item) => item.id === itemId);
+    const itemId = checkbox.dataset.id;
+    const seller = checkbox.dataset.seller;
+    const item = cart.find(cartItem => cartItem.id === itemId && cartItem.seller === seller);
     if (item) {
       selectedItems.push(item);
     }
   });
 
-  // Check if user has provided an address and phone number
-  const tempAddress = sessionStorage.getItem('tempAddress') || user.address;
-  const tempPhone = sessionStorage.getItem('tempPhone') || user.phone;
-
-  // Check if any items were selected for checkout
   if (selectedItems.length === 0) {
     alert('No items selected. Please select items to checkout.');
     return;
   }
 
-  if (!tempAddress || !tempPhone) {
+  let tempAddress = sessionStorage.getItem('tempAddress') || currentUser.address || '';
+  let tempPhone = sessionStorage.getItem('tempPhone') || currentUser.phone || '';
+
+  if (!tempAddress.trim() || !tempPhone.trim()) {
     alert('Please update your address and phone number before proceeding to checkout.');
     return;
   }
 
-  // Calculate total price
-  const totalPrice = selectedItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+  // Group items by seller
+  const groupedItems = selectedItems.reduce((acc, item) => {
+    if (!acc[item.seller]) {
+      acc[item.seller] = [];
+    }
+    acc[item.seller].push(item);
+    return acc;
+  }, {});
 
-  // Confirm purchase with the helper function
-  const confirmPurchase = confirmPurchaseAlert(selectedItems, totalPrice, tempAddress, tempPhone);
+  // Process each seller's order
+  Object.keys(groupedItems).forEach(seller => {
+    const sellerItems = groupedItems[seller];
+    const sellerTotal = sellerItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
-  if (!confirmPurchase) {
-    return; // Exit if user cancels the purchase
-  }
+    const order = {
+      id: `order-${Date.now()}`, // Unique order ID for each seller
+      buyerId: currentBuyerId,
+      buyerName: currentUser.name || 'Anonymous',
+      buyerPhone: tempPhone,
+      buyerAddress: tempAddress,
+      items: sellerItems,
+      total: sellerTotal,
+      date: new Date().toISOString(),
+      status: 'pending',
+      sellerId: seller,
+    };
 
-  // Create order object with buyer details and items
-  const order = {
-    buyerName: user.name || 'Anonymous', // Get buyer's name
-    buyerEmail: user.email || 'Not Provided', // Get buyer's email
-    buyerAddress: tempAddress, // Use updated address or registered address
-    buyerPhone: tempPhone, // Use updated phone number or registered phone
-    items: selectedItems,
-    total: totalPrice, // Calculate total price
-    date: new Date().toISOString(),
-    status: 'pending', // Initially marked as pending
-  };
+    // Save the order to the seller's orders
+    const sellerOrdersKey = `orders_${seller}`;
+    const sellerOrders = JSON.parse(localStorage.getItem(sellerOrdersKey)) || [];
+    sellerOrders.push(order);
+    localStorage.setItem(sellerOrdersKey, JSON.stringify(sellerOrders));
 
-  // Save the order to localStorage (for the buyer)
-  const orders = JSON.parse(localStorage.getItem('orders')) || [];
-  orders.push(order);
-  localStorage.setItem('orders', JSON.stringify(orders));
+    // Save the order to the buyer's orders
+    const buyerOrdersKey = `orders_${currentBuyerId}`;
+    const buyerOrders = JSON.parse(localStorage.getItem(buyerOrdersKey)) || [];
+    buyerOrders.push(order);
+    localStorage.setItem(buyerOrdersKey, JSON.stringify(buyerOrders));
+  });
 
-  // Also save the order to a seller's order list
-  const sellerOrders = JSON.parse(localStorage.getItem('sellerOrders')) || [];
-  sellerOrders.push(order); // You can customize this to include seller-specific info like seller name, etc.
-  localStorage.setItem('sellerOrders', JSON.stringify(sellerOrders));
+  // Clear checked-out items from the buyer's cart
+  const updatedCart = cart.filter(cartItem =>
+    !selectedItems.some(selected => selected.id === cartItem.id && selected.seller === cartItem.seller)
+  );
+  localStorage.setItem(cartKey, JSON.stringify(updatedCart));
 
-  // Clear the cart after purchase
-  localStorage.setItem('cart', JSON.stringify([])); // Empty the cart after purchase
-
-  renderCart(); // Re-render the cart to reflect the updates
-
-  // Redirect to the checkout success page
-  window.location.href = '../buyer/checkout-success.html';  // Redirect to your success page
+  renderCart(); // Update the UI
+  window.location.href = '../buyer/checkout-success.html';
 }
 
+checkoutBtn.addEventListener('click', (event) => {
+  event.stopPropagation();
+  handleCheckout();
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderCart(); // Render the cart
+});

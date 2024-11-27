@@ -59,6 +59,7 @@
       color: white;
       font-weight: bold;
       border-radius: 4px;
+      margin-bottom: 2px;
     }
 
     .order-actions button:hover {
@@ -117,6 +118,46 @@
     fill: white;
 }
 
+/* Styling the search container */
+.search-container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+/* Styling the search input */
+.search-container input[type="text"] {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 250px;
+  font-size: 14px;
+}
+
+/* Styling the buttons */
+.search-container button {
+  padding: 8px 15px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.search-container button:hover {
+  background-color: #0056b3;
+}
+
+.search-container button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+
   </style>
 </head>
 <body>
@@ -124,18 +165,26 @@
         <svg viewBox="0 0 24 24">
             <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
         </svg>
-    </button>
+    </button> 
 
   <h1>Orders</h1>
+  <div class="search-container">
+    <input type="text" id="orderSearch" placeholder="Search by Order ID" />
+    <button id="searchButton">Search</button>
+    <button id="clearSearchButton" style="display: none;">Clear Search</button>
+  </div>
+  
+
   <table id="ordersTable">
     <thead>
       <tr>
+        <th><input type="checkbox" id="selectAllOrders"></th>
+        <th>Order ID</th> <!-- Add this column -->
         <th>Order Date</th>
         <th>Buyer Name</th>
         <th>Contact Number</th>
         <th>Address</th>
-        <th>Item Name</th>
-        <th>Quantity</th>
+        <th>Item Name & Quantity</th>
         <th>Price</th>
         <th>Total</th>
         <th>Actions</th>
@@ -143,74 +192,182 @@
     </thead>
     <tbody></tbody>
   </table>
+  <button id="deleteSelectedOrders" style="display: none;">Delete Selected Orders</button>
+ 
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const ordersTable = document.getElementById('ordersTable').getElementsByTagName('tbody')[0];
-      const orders = JSON.parse(localStorage.getItem('orders')) || [];
-    
-      if (orders.length === 0) {
-        ordersTable.innerHTML = '<tr><td colspan="9" style="text-align:center;">No orders available.</td></tr>';
-        return;
-      }
-    
-      // Render each order
-      orders.forEach((order, index) => {
-        const row = ordersTable.insertRow();
-    
-        row.innerHTML = `
-          <td>${new Date(order.date).toLocaleDateString()}</td>
-          <td>${order.buyerName}</td>
-          <td>${order.buyerPhone}</td>
-          <td>${order.buyerAddress}</td>
-          <td>
-            ${order.items.map(item => item.name).join('<br>')}
-          </td>
-          <td>
-            ${order.items.map(item => item.quantity).join('<br>')}
-          </td>
-          <td>
-            ₱${order.items.map(item => item.price).join('<br>')}
-          </td>
-          <td>₱${order.total}</td>
-          <td class="order-actions">
-            <button onclick="approveOrder(${index})" ${order.status === 'approved' ? 'disabled' : ''}>
-              ${order.status === 'approved' ? 'Approved' : 'Approve'}
-            </button>
-            <button onclick="holdOrder(${index})" ${order.status === 'held' ? 'disabled' : ''}>Hold</button>
-            ${order.status === 'approved' ? `
-              <p style="color: green; font-weight: bold;">Order Approved</p>
-            ` : `
-              <p style="color: red; font-weight: bold;">Pending Approval</p>
-            `}
-          </td>
-        `;
-      });
+
+<script>
+ document.addEventListener('DOMContentLoaded', () => {
+  const ordersTable = document.getElementById('ordersTable').getElementsByTagName('tbody')[0];
+  const selectAllCheckbox = document.getElementById('selectAllOrders');
+  const deleteSelectedButton = document.getElementById('deleteSelectedOrders');
+  const searchInput = document.getElementById('orderSearch');
+  const searchButton = document.getElementById('searchButton');
+  const clearSearchButton = document.getElementById('clearSearchButton');
+  const currentSellerId = localStorage.getItem('currentSellerId');
+
+  if (!currentSellerId) {
+    alert('Please log in as a seller.');
+    return;
+  }
+
+  const sellerOrdersKey = `orders_${currentSellerId}`;
+  let sellerOrders = JSON.parse(localStorage.getItem(sellerOrdersKey)) || [];
+  let filteredOrders = [...sellerOrders]; // Clone to preserve original orders
+
+  if (sellerOrders.length === 0) {
+    ordersTable.innerHTML = '<tr><td colspan="10" style="text-align:center;">No orders available.</td></tr>';
+    deleteSelectedButton.style.display = 'none';
+    return;
+  }
+
+  function renderOrders(orders) {
+  ordersTable.innerHTML = ''; // Clear the table
+
+  if (orders.length === 0) {
+    ordersTable.innerHTML = '<tr><td colspan="10" style="text-align:center;">No orders available.</td></tr>';
+    return;
+  }
+
+  orders.forEach((order, index) => {
+    const row = ordersTable.insertRow();
+    row.dataset.orderIndex = index;
+
+    row.innerHTML = `
+      <td><input type="checkbox" class="order-checkbox" data-index="${index}"></td>
+      <td>${order.id}</td>
+      <td>${new Date(order.date).toLocaleDateString()}</td>
+      <td>${order.buyerName || 'Anonymous'}</td>
+      <td>${order.buyerPhone || 'N/A'}</td>
+      <td>${order.buyerAddress || 'N/A'}</td>
+      <td>${order.items.map(item => `${item.name} x${item.quantity}`).join('<br>')}</td>
+      <td>${order.items.map(item => `₱${item.price}`).join('<br>')}</td>
+      <td>₱${order.total.toFixed(2)}</td>
+      <td class="order-actions">
+        <button class="approve-btn" data-index="${index}" ${order.status === 'approved' ? 'disabled' : ''}>
+          ${order.status === 'approved' ? 'Approved' : 'Approve'}
+        </button>
+        <button class="hold-btn" data-index="${index}" ${order.status === 'held' ? 'disabled' : ''}>Hold</button>
+        <p style="color: ${order.status === 'approved' ? 'green' : 'red'}; font-weight: bold;">
+          ${order.status === 'approved' ? 'Order Approved' : 'Pending Approval'}
+        </p>
+      </td>
+    `;
+  });
+}
+
+
+  // Render initial orders
+  renderOrders(filteredOrders);
+
+  // Search functionality
+  searchButton.addEventListener('click', () => {
+    const searchValue = searchInput.value.trim().toLowerCase();
+    if (!searchValue) return;
+
+    filteredOrders = sellerOrders.filter(order => order.id.toLowerCase().includes(searchValue));
+    renderOrders(filteredOrders);
+
+  });
+
+  // Clear search functionality
+  clearSearchButton.addEventListener('click', () => {
+    searchInput.value = '';
+    filteredOrders = [...sellerOrders]; // Reset to original orders
+    renderOrders(filteredOrders);
+
+    // Hide clear search button
+    clearSearchButton.style.display = 'none';
+  });
+
+  // Select all checkboxes
+  selectAllCheckbox.addEventListener('change', () => {
+    const checkboxes = ordersTable.querySelectorAll('.order-checkbox');
+    checkboxes.forEach(checkbox => {
+      checkbox.checked = selectAllCheckbox.checked;
     });
-  
-    // Approve order
-    function approveOrder(orderIndex) {
-      const orders = JSON.parse(localStorage.getItem('orders')) || [];
-    
-      // Mark the order as approved
-      orders[orderIndex].status = 'approved';
-    
-      // Save the updated orders list back to localStorage
-      localStorage.setItem('orders', JSON.stringify(orders));
-    
-      // Reload the page to reflect the changes
-      location.reload(); 
+    updateDeleteButtonVisibility();
+  });
+
+  // Update delete button visibility based on individual checkbox changes
+  ordersTable.addEventListener('change', (event) => {
+    if (event.target.classList.contains('order-checkbox')) {
+      updateDeleteButtonVisibility();
     }
-  
-    // Hold order
-    function holdOrder(orderIndex) {
-      const orders = JSON.parse(localStorage.getItem('orders')) || [];
-      orders[orderIndex].status = 'held';
-      localStorage.setItem('orders', JSON.stringify(orders));
-      location.reload(); // Reload page to reflect changes
+  });
+
+  // Update delete button visibility
+  function updateDeleteButtonVisibility() {
+    const selectedOrders = document.querySelectorAll('.order-checkbox:checked');
+    deleteSelectedButton.style.display = selectedOrders.length > 0 ? 'block' : 'none';
+  }
+
+  // Delete selected orders
+  deleteSelectedButton.addEventListener('click', () => {
+    const selectedCheckboxes = Array.from(document.querySelectorAll('.order-checkbox:checked'));
+    const selectedIndices = selectedCheckboxes.map(checkbox => parseInt(checkbox.dataset.index, 10));
+
+    // Remove selected orders
+    sellerOrders = sellerOrders.filter((_, index) => !selectedIndices.includes(index));
+    filteredOrders = [...sellerOrders]; // Update filtered orders
+    localStorage.setItem(sellerOrdersKey, JSON.stringify(sellerOrders));
+
+    renderOrders(filteredOrders);
+    location.reload(); // Reload the page to reflect changes
+  });
+
+  // Approve or hold order
+  ordersTable.addEventListener('click', (event) => {
+    const target = event.target;
+
+    if (target.classList.contains('approve-btn')) {
+      const index = target.dataset.index;
+      updateOrderStatus(index, 'approved');
+    } else if (target.classList.contains('hold-btn')) {
+      const index = target.dataset.index;
+      updateOrderStatus(index, 'held');
     }
+  });
+
+  // Function to update order status
+  function updateOrderStatus(orderIndex, status) {
+  const orderToUpdate = sellerOrders[orderIndex];
+
+  if (!orderToUpdate) {
+    alert('Order not found.');
+    return;
+  }
+
+  // Update the order status
+  orderToUpdate.status = status;
+
+  // Remove the order from its current position
+  const [approvedOrder] = sellerOrders.splice(orderIndex, 1);
+
+  // Add the order to the end of the array
+  sellerOrders.push(approvedOrder);
+
+  // Update localStorage
+  localStorage.setItem(sellerOrdersKey, JSON.stringify(sellerOrders));
+
+  // Update status in buyer's orders
+  const buyerId = orderToUpdate.buyerId;
+  const buyerOrdersKey = `orders_${buyerId}`;
+  const buyerOrders = JSON.parse(localStorage.getItem(buyerOrdersKey)) || [];
+  const buyerOrderToUpdate = buyerOrders.find(order => order.id === orderToUpdate.id);
+
+  if (buyerOrderToUpdate) {
+    buyerOrderToUpdate.status = status;
+    localStorage.setItem(buyerOrdersKey, JSON.stringify(buyerOrders));
+  }
+
+  // Re-render the order table
+  renderOrders(sellerOrders);
+}
+ });
   </script>
-  
+
+
 
 </body>
 </html>

@@ -141,60 +141,70 @@
   </div>
 
   <script>
-    document.getElementById('registerForm').addEventListener('submit', function(event) {
-      event.preventDefault();
+   document.getElementById('registerForm').addEventListener('submit', function(event) {
+  event.preventDefault();
 
-      // Get form values
-      const name = document.getElementById('name').value;
-      const email = document.getElementById('email').value;
-      const address = document.getElementById('address').value;  // Make sure to get address
-      const phone = document.getElementById('phone').value;      // Make sure to get phone
-      const password = document.getElementById('password').value;
-      const confirmPassword = document.getElementById('confirmPassword').value;
-      const role = document.querySelector('input[name="role"]:checked')?.value;
+  // Get form values
+  const name = document.getElementById('name').value;
+  const email = document.getElementById('email').value;
+  const address = document.getElementById('address').value;
+  const phone = document.getElementById('phone').value;
+  const password = document.getElementById('password').value;
+  const confirmPassword = document.getElementById('confirmPassword').value;
+  const role = document.querySelector('input[name="role"]:checked')?.value;
 
-       // Check if passwords match
-    if (password !== confirmPassword) {
-        document.getElementById('error-message').style.display = 'block';
-        return;
-    }
+  // Check if passwords match
+  if (password !== confirmPassword) {
+    alert('Passwords do not match!');
+    return;
+  }
 
-    // Get existing users array from localStorage
-    const users = JSON.parse(localStorage.getItem('users')) || [];
+  // Get existing users array from localStorage
+  const users = JSON.parse(localStorage.getItem('users')) || [];
 
-    // Check if email already exists
-    if (users.some(user => user.email === email)) {
-        alert('Email already registered. Please use a different email.');
-        return;
-    }
+  // Check if email already exists
+  if (users.some(user => user.email === email)) {
+    alert('Email already registered. Please use a different email.');
+    return;
+  }
 
-    // Create new user object
-    const newUser = {
-        name,
-        email,
-        address,
-        phone,
-        password,
-        role
-    };
+  // Generate a unique ID for the user
+  const userId = `user-${Date.now()}`; // Generate a timestamp-based unique ID
 
-    // Add new user to array
-    users.push(newUser);
+  // Create new user object
+  const newUser = {
+    id: userId,
+    name,
+    email,
+    address,
+    phone,
+    password,
+    role,
+  };
 
-    // Save updated users array back to localStorage
-    localStorage.setItem('users', JSON.stringify(users));
+  // Add new user to the array
+  users.push(newUser);
 
-    // Store current user email for session management
-    localStorage.setItem('currentUserEmail', email);
+  // Save updated users array back to localStorage
+  localStorage.setItem('users', JSON.stringify(users));
 
-    // Redirect based on role
-    alert('Registration successful!');
-    if (role === 'buyer') {
-        window.location.href = '../login/loginBuyer.html';
-    } else if (role === 'seller') {
-        window.location.href = '../login/loginSeller.html';
-    }
+  // Store current user ID for session management
+  if (role === 'seller') {
+    localStorage.setItem('currentSellerId', newUser.id);
+  } else if (role === 'buyer') {
+    localStorage.setItem('currentBuyerId', newUser.id);
+  }
+
+  // Redirect based on role
+  alert('Registration successful!');
+  if (role === 'buyer') {
+    window.location.href = '../login/loginBuyer.html';
+  } else if (role === 'seller') {
+    window.location.href = '../login/loginSeller.html';
+  }
 });
+
+
   </script>
 
 </body>

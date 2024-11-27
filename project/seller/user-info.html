@@ -121,105 +121,122 @@
   </div>
 
   <script>
-   document.addEventListener('DOMContentLoaded', () => {
-  const currentUserEmail = localStorage.getItem('currentUserEmail');
-  const users = JSON.parse(localStorage.getItem('users')) || [];
+    document.addEventListener('DOMContentLoaded', () => {
+    const currentSellerId = localStorage.getItem('currentSellerId');
+    const users = JSON.parse(localStorage.getItem('users')) || [];
 
-  const currentUser = users.find(user => user.email === currentUserEmail);
+    let currentUser;
 
-  if (currentUser) {
-    // Populate user info on page load
-    document.getElementById('userName').textContent = currentUser.name;
-    document.getElementById('userEmail').textContent = currentUser.email;
-    document.getElementById('userAddress').textContent = currentUser.address || 'Not Provided';
-    document.getElementById('userPhone').textContent = currentUser.phone || 'Not Provided';
-  } else {
-    alert('No user data found. Please log in again.');
-  }
+    // Only check for the seller ID
+    if (currentSellerId) {
+        currentUser = users.find(user => user.id === currentSellerId);
+    }
 
-  const editBtn = document.getElementById('editBtn');
-  const saveBtn = document.getElementById('saveBtn');
-  const cancelBtn = document.getElementById('cancelBtn');
-  const editFields = document.querySelectorAll('.user-info input');
+    if (currentUser) {
+        // Display the logged-in seller's information
+        document.getElementById('userName').textContent = currentUser.name;
+        document.getElementById('userEmail').textContent = currentUser.email;
+        document.getElementById('userAddress').textContent = currentUser.address || 'Not Provided';
+        document.getElementById('userPhone').textContent = currentUser.phone || 'Not Provided';
+    } else {
+        alert('No seller data found. Please log in again.');
+    }
 
-  // Enable editing
-  editBtn.addEventListener("click", () => {
-    // Toggle input visibility for editing
-    document.getElementById('userName').style.display = "none";
-    document.getElementById('userEmail').style.display = "none";
-    document.getElementById('userAddress').style.display = "none";
-    document.getElementById('userPhone').style.display = "none";
-
-    document.getElementById('editUserName').style.display = "block";
-    document.getElementById('editUserEmail').style.display = "block";
-    document.getElementById('editUserAddress').style.display = "block";
-    document.getElementById('editUserPhone').style.display = "block";
-
-    // Populate the input fields with current values
-    document.getElementById('editUserName').value = document.getElementById('userName').textContent;
-    document.getElementById('editUserEmail').value = document.getElementById('userEmail').textContent;
-    document.getElementById('editUserAddress').value = document.getElementById('userAddress').textContent;
-    document.getElementById('editUserPhone').value = document.getElementById('userPhone').textContent;
-
-    // Toggle button visibility
-    editBtn.style.display = "none";
-    saveBtn.style.display = "inline-block";
-    cancelBtn.style.display = "inline-block";
-  });
-
-  // Save updated info
-  saveBtn.addEventListener('click', () => {
-    const updatedUser = {
-      name: document.getElementById('editUserName').value || storedUser.name,
-      email: document.getElementById('editUserEmail').value || storedUser.email,
-      address: document.getElementById('editUserAddress').value || storedUser.address,
-      phone: document.getElementById('editUserPhone').value || storedUser.phone
-    };
-
-    // Save updated user info to localStorage
-    localStorage.setItem('user', JSON.stringify(updatedUser));
-
-    // Update UI with the newly saved values
-    document.getElementById('userName').textContent = updatedUser.name;
-    document.getElementById('userEmail').textContent = updatedUser.email;
-    document.getElementById('userAddress').textContent = updatedUser.address;
-    document.getElementById('userPhone').textContent = updatedUser.phone;
-
-    // Hide input fields and show the updated information
-    editFields.forEach(field => {
-      field.style.display = 'none';
-    });
-
-    // Show updated user info in spans
-    document.getElementById('userName').style.display = 'inline';
-    document.getElementById('userEmail').style.display = 'inline';
-    document.getElementById('userAddress').style.display = 'inline';
-    document.getElementById('userPhone').style.display = 'inline';
-
-    // Toggle buttons visibility
-    saveBtn.style.display = 'none';
-    cancelBtn.style.display = 'none';
-    editBtn.style.display = 'inline-block';
-  });
-
-  // Cancel editing
-  cancelBtn.addEventListener('click', () => {
-    // Hide input fields and show original information
-    editFields.forEach(field => {
-      field.style.display = 'none';
-    });
-
-    document.getElementById('userName').style.display = 'inline';
-    document.getElementById('userEmail').style.display = 'inline';
-    document.getElementById('userAddress').style.display = 'inline';
-    document.getElementById('userPhone').style.display = 'inline';
-
-    // Toggle buttons visibility
-    saveBtn.style.display = 'none';
-    cancelBtn.style.display = 'none';
-    editBtn.style.display = 'inline-block';
-  });
-});
+   
+   
+   
+   
+     const editBtn = document.getElementById('editBtn');
+     const saveBtn = document.getElementById('saveBtn');
+     const cancelBtn = document.getElementById('cancelBtn');
+     const editFields = document.querySelectorAll('.user-info input');
+   
+     // Enable editing
+     editBtn.addEventListener('click', () => {
+       // Toggle input visibility for editing
+       document.getElementById('userName').style.display = 'none';
+       document.getElementById('userEmail').style.display = 'none';
+       document.getElementById('userAddress').style.display = 'none';
+       document.getElementById('userPhone').style.display = 'none';
+   
+       document.getElementById('editUserName').style.display = 'block';
+       document.getElementById('editUserEmail').style.display = 'block';
+       document.getElementById('editUserAddress').style.display = 'block';
+       document.getElementById('editUserPhone').style.display = 'block';
+   
+       // Populate the input fields with current values
+       document.getElementById('editUserName').value = document.getElementById('userName').textContent;
+       document.getElementById('editUserEmail').value = document.getElementById('userEmail').textContent;
+       document.getElementById('editUserAddress').value = document.getElementById('userAddress').textContent;
+       document.getElementById('editUserPhone').value = document.getElementById('userPhone').textContent;
+   
+       // Toggle button visibility
+       editBtn.style.display = 'none';
+       saveBtn.style.display = 'inline-block';
+       cancelBtn.style.display = 'inline-block';
+     });
+   
+     // Save updated info
+     saveBtn.addEventListener('click', () => {
+       const updatedUser = {
+         ...currentUser, // Retain existing user data
+         name: document.getElementById('editUserName').value,
+         email: document.getElementById('editUserEmail').value,
+         address: document.getElementById('editUserAddress').value,
+         phone: document.getElementById('editUserPhone').value,
+       };
+   
+       // Update the user in the users array
+       const userIndex = users.findIndex(user => user.email === currentUser.email);
+       if (userIndex !== -1) {
+         users[userIndex] = updatedUser;
+       }
+   
+       // Save updated users array back to localStorage
+       localStorage.setItem('users', JSON.stringify(users));
+   
+       // Update UI with the newly saved values
+       document.getElementById('userName').textContent = updatedUser.name;
+       document.getElementById('userEmail').textContent = updatedUser.email;
+       document.getElementById('userAddress').textContent = updatedUser.address;
+       document.getElementById('userPhone').textContent = updatedUser.phone;
+   
+       // Hide input fields and show the updated information
+       editFields.forEach(field => {
+         field.style.display = 'none';
+       });
+   
+       document.getElementById('userName').style.display = 'inline';
+       document.getElementById('userEmail').style.display = 'inline';
+       document.getElementById('userAddress').style.display = 'inline';
+       document.getElementById('userPhone').style.display = 'inline';
+   
+       // Toggle button visibility
+       saveBtn.style.display = 'none';
+       cancelBtn.style.display = 'none';
+       editBtn.style.display = 'inline-block';
+   
+       alert('Profile updated successfully!');
+     });
+   
+     // Cancel editing
+     cancelBtn.addEventListener('click', () => {
+       // Hide input fields and restore original information
+       editFields.forEach(field => {
+         field.style.display = 'none';
+       });
+   
+       document.getElementById('userName').style.display = 'inline';
+       document.getElementById('userEmail').style.display = 'inline';
+       document.getElementById('userAddress').style.display = 'inline';
+       document.getElementById('userPhone').style.display = 'inline';
+   
+       // Toggle button visibility
+       saveBtn.style.display = 'none';
+       cancelBtn.style.display = 'none';
+       editBtn.style.display = 'inline-block';
+     });
+   });
 
   </script>
 </body>

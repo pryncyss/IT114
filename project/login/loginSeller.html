@@ -32,32 +32,46 @@
     </div>
   </div>
 
-  <script>
- document.getElementById('loginForm').addEventListener('submit', function(event) {
-      event.preventDefault();
-  
-      // Corrected input ID for username
-      const username = document.getElementById('username').value;
-      const password = document.getElementById('password').value;
-      const users = JSON.parse(localStorage.getItem('users')) || [];
-  
-      // Find the user
-      const user = users.find(user => user.email === username && user.password === password);
-  
-      if (user) {
-        // Save current user's email to localStorage for session management
-        localStorage.setItem('currentUserEmail', username);
-        // Check if the user role is 'Buyer'
-        if (user.role === 'seller') {
-          alert('Login successful!');
-          window.location.href = '../seller/sellerDash.html'; // Redirect to buyer dashboard
-        } else {
-          alert('Invalid credentials: You are not a buyer.');
+
+ <script>
+document.getElementById('loginForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+
+    // Check if the user exists and has the seller role
+    const user = users.find(user => user.email === username && user.password === password && user.role === 'seller');
+
+    if (user) {
+        // Store the seller's unique ID in localStorage
+        localStorage.setItem('currentSellerId', user.id);
+
+        // Ensure the seller's data is initialized in localStorage
+        const sellerKey = `seller_${user.id}`;
+        if (!localStorage.getItem(sellerKey)) {
+            const initialSellerData = { products: [], orders: [] };
+            localStorage.setItem(sellerKey, JSON.stringify(initialSellerData));
         }
-      } else {
-        alert('Invalid credentials: Username or password is incorrect.');
-      }
-    });
-  </script>
+
+        alert('Login successful!');
+        window.location.href = '../seller/sellerDash.html'; // Redirect to the seller's dashboard
+    } else {
+        alert('Invalid credentials or you are not registered as a seller.');
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const currentSellerId = localStorage.getItem('currentSellerId');
+
+    if (currentSellerId) {
+        // If a seller is already logged in, redirect them to their dashboard
+        window.location.href = '../seller/sellerDash.html';
+    }
+});
+</script>
+
+
 </body>
 </html>

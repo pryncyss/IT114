@@ -103,6 +103,7 @@ body {
 .purchased-item-details {
     display: flex;
     align-items: center;
+    text-align: center;
     gap: 15px;
     flex: 1; /* Take available space but not more */
     max-width: 70%; /* Limit width of details section */
@@ -110,11 +111,11 @@ body {
 
 /* Image styling */
 .purchased-item-details img {
-    width: 60px;
+    width: 80px;
     height: 60px;
-    object-fit: cover;
+    object-fit: contents;
     border-radius: 8px;
-    flex-shrink: 0; /* Prevent image from shrinking */
+   
 }
 
 /* Product name and price text */
@@ -292,67 +293,131 @@ body {
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-          const purchasedItemsContainer = document.getElementById('purchasedItems');
-          const orders = JSON.parse(localStorage.getItem('orders')) || [];
-      
-          if (orders.length === 0) {
-            const noOrdersMessage = document.createElement('div');
-            noOrdersMessage.classList.add('no-orders-message');
-            noOrdersMessage.textContent = 'No purchased products found.';
-            purchasedItemsContainer.appendChild(noOrdersMessage);
-            return;
-          }
-      
-          // Render each order
-          orders.forEach((order) => {
-            const orderElement = document.createElement('div');
-            orderElement.classList.add('order');
-            orderElement.innerHTML = `
-              <div class="order-details">
-                <h4>Order Date: ${new Date(order.date).toLocaleDateString()}</h4>
-                <p><strong>Status:</strong> ${order.status === 'approved' ? 'Approved' : 'Pending'}</p>
-                <p><strong>Total:</strong> ₱${order.total.toFixed(2)}</p>
-      
-                <div class="order-items">
-                  <h5>Items:</h5>
-                  <ul>
-                    ${order.items.map(item => `
-                      <li class="purchased-item">
-                        <div class="purchased-item-details">
-                          <img src="${item.image || 'default-image.png'}" alt="${item.name}" width="50" />
-                          <span>${item.name} - ₱${item.price} x ${item.quantity}</span>
-                        </div>
-                        <div class="purchased-item-actions">
-                          ${order.status === 'approved' ? `
-                            <button class="received-btn" onclick="markReceived('${item.name}', this)">Receive</button>
-                            <button class="review-btn" onclick="writeReview('${item.name}')">Review</button>
-                        ` : ''}
+      document.addEventListener('DOMContentLoaded', () => {
+  const currentBuyerId = localStorage.getItem('currentBuyerId');
+  if (!currentBuyerId) {
+    alert('Please log in to view your purchases.');
+    return;
+  }
+  
 
-                        </div>
-                      </li>
-                    `).join('')}
-                  </ul>
-                </div>
-              </div>
-            `;
-            purchasedItemsContainer.appendChild(orderElement);
-          });
-        });
-      
-        function markReceived(itemName, buttonElement) {
-    if (buttonElement.classList.contains('received')) return; // Prevent further clicks
+  const buyerOrdersKey = `orders_${currentBuyerId}`;
+  const orders = JSON.parse(localStorage.getItem(buyerOrdersKey)) || [];
+  const purchasedItemsContainer = document.getElementById('purchasedItems');
 
-    // Update button state
-    buttonElement.classList.add('received'); // Add "received" class for styling
-    buttonElement.textContent = 'Received'; // Change text
-    buttonElement.disabled = true; // Disable the button
+  if (orders.length === 0) {
+    const noOrdersMessage = document.createElement('div');
+    noOrdersMessage.classList.add('no-orders-message');
+    noOrdersMessage.textContent = 'No purchased products found.';
+    purchasedItemsContainer.appendChild(noOrdersMessage);
+    return;
+  }
+
+  // Group orders by seller
+  const groupedOrders = orders.reduce((acc, order) => {
+    const seller = order.items[0]?.seller || 'Unknown Seller';
+    if (!acc[seller]) acc[seller] = [];
+    acc[seller].push(order);
+    return acc;
+  }, {});
+
+  // Render orders grouped by seller
+  Object.keys(groupedOrders).forEach(seller => {
+    const sellerContainer = document.createElement('div');
+    sellerContainer.classList.add('seller-container');
+    sellerContainer.innerHTML = `
+      <h3>Seller: ${seller}</h3>
+    `;
+
+    groupedOrders[seller].forEach(order => {
+      const orderElement = document.createElement('div');
+      orderElement.classList.add('order');
+      orderElement.innerHTML = `
+        <div class="order-details">
+          <h4>Order Date: ${new Date(order.date).toLocaleDateString()}</h4>
+          <p><strong>Status:</strong> ${order.status === 'approved' ? 'Approved' : 'Pending'}</p>
+          <p><strong>Order ID:</strong> ${order.id}</p>
+          <p><strong>Total:</strong> ₱${order.total.toFixed(2)}</p>
+          <div class="order-items">
+            <h5>Items:</h5>
+            <ul>
+              ${order.items.map(item => `
+                <li class="purchased-item">
+                  <div class="purchased-item-details">
+                    <img src="${item.image || 'default-image.png'}" alt="${item.name}" width="50" />
+                    <span>${item.name} - ₱${item.price} x ${item.quantity}</span>
+                  </div>
+                  <div class="purchased-item-actions">
+                    ${order.status === 'approved' ? `
+                      <button class="received-btn" onclick="markReceived('${item.name}', this)">Receive</button>
+                      <button class="review-btn" onclick="writeReview('${item.name}')">Review</button>
+                    ` : ''}
+                  </div>
+                </li>
+              `).join('')}
+            </ul>
+          </div>
+        </div>
+      `;
+      sellerContainer.appendChild(orderElement);
+    });
+
+    purchasedItemsContainer.appendChild(sellerContainer);
+  });
+});
+
+function markReceived(itemName, buttonElement) {
+  if (buttonElement.classList.contains('received')) return;
+
+  // Update button state
+  buttonElement.classList.add('received');
+  buttonElement.textContent = 'Received';
+  buttonElement.disabled = true;
+
+  // Notify the seller
+  const currentBuyerId = localStorage.getItem('currentBuyerId');
+  const buyerOrdersKey = `orders_${currentBuyerId}`;
+  const orders = JSON.parse(localStorage.getItem(buyerOrdersKey)) || [];
+
+  // Find the order and item
+  const order = orders.find(order =>
+    order.items.some(item => item.name === itemName)
+  );
+
+  if (order) {
+    // Retrieve the sellerId
+    const item = order.items.find(item => item.name === itemName);
+    if (!item || !item.sellerId) {
+      console.error('Seller ID is missing or undefined for the item.');
+      return;
+    }
+
+    const sellerId = item.sellerId; // Get the sellerId
+    const sellerNotificationsKey = `notifications_${sellerId}`;
+    const sellerNotifications = JSON.parse(localStorage.getItem(sellerNotificationsKey)) || [];
+
+    // Add notification
+    const newNotification = {
+      message: `Buyer ${currentBuyerId} has confirmed receipt of: ${itemName}.`,
+      timestamp: new Date().toISOString(),
+      read: false,
+    };
+
+    sellerNotifications.push(newNotification);
+
+    // Save updated notifications
+    localStorage.setItem(sellerNotificationsKey, JSON.stringify(sellerNotifications));
+    console.log(`Notification added to ${sellerNotificationsKey}:`, newNotification);
+  } else {
+    console.error('Order or item not found.');
+  }
 }
 
-      
-        function writeReview(itemName) {
-          window.location.href = `buyerReview.html?item=${encodeURIComponent(itemName)}`;
-        }
+
+
+function writeReview(itemName) {
+  window.location.href = `buyerReview.html?item=${encodeURIComponent(itemName)}`;
+}
 
       </script>
       
