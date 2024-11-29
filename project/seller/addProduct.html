@@ -3,31 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="sellerDash.css">
     <title>Add Products</title>
 </head>
 <style>
-    * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
-}
 
-body {
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #1a1b2e;
-}
-
-.container {
-    width: 100%;
-    max-width: 800px;
-    padding: 2rem;
-    position: relative;
-}
 
 .close-btn {
     position: absolute;
@@ -195,6 +177,13 @@ h3 {
     margin-top: 1rem;
 }
 
+#productForm{
+    max-width: 800px;
+    margin-left: 15%;
+}
+
+
+
 .submit-btn {
     display: block;
     width: 100%;
@@ -270,14 +259,49 @@ h3 {
     height: 20px;
     fill: white;
 }
+@media (max-width: 768px) {
+    #productForm{
+    max-width: 800px;
+    margin-right: 15%;
+}
+}
+
+@media (max-width: 1024px) {
+    #productForm{
+    max-width: 800px;
+    margin-right: 15%;
+}
+}
+
+@media (max-width: 480px) {
+    #productForm{
+    max-width: 800px;
+    margin-right: 15%;
+}
+}
+
 </style>
 <body>
-        <button class="close-btn">
-            <svg viewBox="0 0 24 24">
-                <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
-            </svg>
-        </button>
-        <div class="container">
+    <div class="hamburger" onclick="toggleMenu()">
+        <i class="fas fa-bars"></i>
+    </div>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="logo">
+                <img src="../images/logo.png" alt="AquaMarket">
+                <span class="logo-text"><b>AQUAMARKET</b></span>
+            </div>
+            <ul class="nav-menu">
+                <a href="sellerDash.html"><i class="fas fa-chart-line"></i> Overview</a>
+                <a href="addProduct.html" class="active"><i class="fas fa-plus"></i> Add products</a>
+                <a href="ProductList.html"><i class="fas fa-list"></i> Product List</a>
+                <a href="order.html"><i class="fas fa-shopping-cart"></i> Orders</a>
+                <a href="review2.html"><i class="fas fa-star"></i>Reviews</a>
+            </ul>
+        </div>
+
+        <main class="main-content">
         <h1>Add products</h1>
         <h2>Add Product For Your Customer</h2>
         
@@ -348,7 +372,7 @@ h3 {
             <button type="submit" class="submit-btn">Submit Product</button>
         </form>
     </div>
-</div>
+</main>
     <script src="addProduct.js"></script>
 </body>
 </html>

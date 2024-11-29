@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
   <title>Register</title>
   <style>
     body {
@@ -70,6 +72,32 @@
       font-size: 14px;
       display: none;
     }
+
+    /* Password Wrapper */
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-wrapper input {
+  flex: 1;
+  padding-right: 40px; /* Space for the icon */
+}
+
+.password-wrapper .password-toggle {
+  position: absolute;
+  right: 10px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: #fff;
+  user-select: none;
+}
+
+.password-wrapper .password-toggle:hover {
+  color: #ffffff4d;
+}
+
   </style>
 </head>
 <body>
@@ -105,14 +133,21 @@
         <!-- Password -->
         <div class="form-group">
           <label for="password">Password:</label>
-          <input type="password" id="password" name="password" placeholder="Enter your password" required>
+          <div class="password-wrapper">
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            <i class="fa fa-eye password-toggle" id="togglePassword"></i>
+          </div>
         </div>
         
-        <!-- Confirm Password -->
         <div class="form-group">
           <label for="confirmPassword">Confirm Password:</label>
-          <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required>
+          <div class="password-wrapper">
+            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required>
+            <i class="fa fa-eye password-toggle" id="toggleConfirmPassword"></i>
+          </div>
         </div>
+        
+        
 
         <!-- Role -->
         <div class="form-group">
@@ -141,68 +176,92 @@
   </div>
 
   <script>
-   document.getElementById('registerForm').addEventListener('submit', function(event) {
-  event.preventDefault();
+  document.getElementById('registerForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+  
+    // Get form values
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const address = document.getElementById('address').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const password = document.getElementById('password').value.trim();
+    const confirmPassword = document.getElementById('confirmPassword').value.trim();
+    const role = document.querySelector('input[name="role"]:checked')?.value;
+  
+    // Check if passwords match
+    if (password !== confirmPassword) {
+      alert('Passwords do not match!');
+      return;
+    }
+  
+    // Get existing users array from localStorage
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+  
+    // Check if email already exists
+    if (users.some(user => user.email === email)) {
+      alert('Email already registered. Please use a different email.');
+      return;
+    }
+  
+  
+    // Generate a unique ID for the user
+    const userId = `user-${Date.now()}`; // Generate a timestamp-based unique ID
+  
+    // Create new user object
+    const newUser = {
+      id: userId,
+      name,
+      email,
+      address,
+      phone,
+      password,
+      role,
+    };
+  
+    // Add new user to the array
+    users.push(newUser);
+  
+    // Save updated users array back to localStorage
+    localStorage.setItem('users', JSON.stringify(users));
+  
+    // Store current user ID for session management
+    if (role === 'seller') {
+      localStorage.setItem('currentSellerId', newUser.id);
+    } else if (role === 'buyer') {
+      localStorage.setItem('currentBuyerId', newUser.id);
+    }
+  
+    // Redirect based on role
+    alert('Registration successful!');
+    if (role === 'buyer') {
+      window.location.href = '../login/loginBuyer.html';
+    } else if (role === 'seller') {
+      window.location.href = '../login/loginSeller.html';
+    }
+  });
+  
+document.addEventListener('DOMContentLoaded', () => {
+  const togglePassword = document.getElementById('togglePassword');
+  const passwordField = document.getElementById('password');
 
-  // Get form values
-  const name = document.getElementById('name').value;
-  const email = document.getElementById('email').value;
-  const address = document.getElementById('address').value;
-  const phone = document.getElementById('phone').value;
-  const password = document.getElementById('password').value;
-  const confirmPassword = document.getElementById('confirmPassword').value;
-  const role = document.querySelector('input[name="role"]:checked')?.value;
+  const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
+  const confirmPasswordField = document.getElementById('confirmPassword');
 
-  // Check if passwords match
-  if (password !== confirmPassword) {
-    alert('Passwords do not match!');
-    return;
-  }
+  // Toggle visibility for password
+  togglePassword.addEventListener('click', () => {
+    const type = passwordField.type === 'password' ? 'text' : 'password';
+    passwordField.type = type;
+    togglePassword.classList.toggle('fa-eye-slash');
+  });
 
-  // Get existing users array from localStorage
-  const users = JSON.parse(localStorage.getItem('users')) || [];
-
-  // Check if email already exists
-  if (users.some(user => user.email === email)) {
-    alert('Email already registered. Please use a different email.');
-    return;
-  }
-
-  // Generate a unique ID for the user
-  const userId = `user-${Date.now()}`; // Generate a timestamp-based unique ID
-
-  // Create new user object
-  const newUser = {
-    id: userId,
-    name,
-    email,
-    address,
-    phone,
-    password,
-    role,
-  };
-
-  // Add new user to the array
-  users.push(newUser);
-
-  // Save updated users array back to localStorage
-  localStorage.setItem('users', JSON.stringify(users));
-
-  // Store current user ID for session management
-  if (role === 'seller') {
-    localStorage.setItem('currentSellerId', newUser.id);
-  } else if (role === 'buyer') {
-    localStorage.setItem('currentBuyerId', newUser.id);
-  }
-
-  // Redirect based on role
-  alert('Registration successful!');
-  if (role === 'buyer') {
-    window.location.href = '../login/loginBuyer.html';
-  } else if (role === 'seller') {
-    window.location.href = '../login/loginSeller.html';
-  }
+  // Toggle visibility for confirm password
+  toggleConfirmPassword.addEventListener('click', () => {
+    const type = confirmPasswordField.type === 'password' ? 'text' : 'password';
+    confirmPasswordField.type = type;
+    toggleConfirmPassword.classList.toggle('fa-eye-slash');
+  });
 });
+
 
 
   </script>

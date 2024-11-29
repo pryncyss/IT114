@@ -3,16 +3,114 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <title>Orders Page</title>
   <style>
     /* Basic styling for the orders page */
-    body {
-      font-family: 'Poppins', sans-serif;
-      margin: 0;
-      padding: 20px;
-      background-color: #1a1b2e;
-    }
+    :root {
+--primary-color: #1a1b2e;
+--secondary-color: #1e90ff;
+--text-color: #ffffff;
+--sidebar-width: 240px;
+--card-bg: #242544;
+}
+
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+font-family: 'Poppins', sans-serif;
+}
+
+body {
+background-color: var(--primary-color);
+}
+
+.container {
+display: flex;
+min-height: 100vh;
+}
+
+/* Sidebar Styles */
+.sidebar {
+width: var(--sidebar-width);
+background: linear-gradient(180deg, #08629C 0%, #1a7fd1 100%);
+padding: 2rem;
+position: fixed;
+height: 100vh;
+overflow-y: auto;
+z-index: 999;
+transition: transform 0.3s ease-in-out;
+}
+
+.sidebar.hidden {
+transform: translateX(-100%);
+}
+
+
+.logo {
+margin-bottom: 2rem;
+text-align: center;
+}
+
+.logo img {
+max-width: 150px;
+}
+
+.logo-text{
+color: #08B6D9;
+font-size: 24px;
+}
+
+.nav-menu {
+display: flex;
+flex-direction: column;
+gap: 1rem;
+}
+
+.nav-menu a {
+color: var(--text-color);
+text-decoration: none;
+padding: 1rem;
+border-radius: 8px;
+transition: background-color 0.3s;
+display: flex;
+align-items: center;
+gap: 0.75rem;
+}
+
+.nav-menu a:hover,
+.nav-menu a.active {
+background-color: rgba(255, 255, 255, 0.1);
+}
+
+.nav-menu a i {
+width: 20px;
+}
+
+/* Hamburger Menu Button */
+.hamburger {
+display: none;
+position: fixed;
+top: 1rem;
+left: 1rem;
+background: none;
+border: none;
+color: var(--text-color);
+font-size: 1.5rem;
+z-index: 1000;
+cursor: pointer;
+padding: 0.5rem;
+}
+
+
+/* Main Content Styles */
+.main-content {
+margin-left: var(--sidebar-width);
+padding: 2rem;
+width: calc(100% - var(--sidebar-width));
+}
 
     h1 {
       text-align: center;
@@ -49,6 +147,7 @@
 
     h1{
         color: #fff;
+        margin-bottom: 3rem;
     }
     .order-actions button {
       padding: 5px 10px;
@@ -157,16 +256,109 @@
   cursor: not-allowed;
 }
 
+#logout-btn {
+width: 100%;
+padding: 10px 20px;
+background-color: #f44336;
+color: white;
+font-size: 16px;
+text-align: left;
+border: none;
+border-radius: 4px;
+cursor: pointer;
+margin-top: 10px;
+transition: background-color 0.3s ease, transform 0.2s;
+}
+
+#logout-btn:hover {
+background-color: #d32f2f;
+transform: scale(1.05);
+}
+
+#logout-btn:active {
+background-color: #c62828;
+transform: scale(0.95);
+}
+
+#logout-btn i {
+margin-right: 10px;
+font-size: 18px;
+}
+
+
+@media (max-width: 1024px) {
+.hamburger {
+display: block;
+}
+
+.sidebar {
+width: var(--sidebar-width);
+transform: translateX(-100%);
+}
+
+.sidebar.active {
+transform: translateX(0);
+}
+
+.main-content {
+margin-left: 0;
+width: 100%;
+}
+
+/* Keep the text in nav menu */
+.nav-menu a span {
+display: inline;
+}
+}
+
+@media (max-width: 768px) {
+.container {
+flex-direction: column;
+}
+
+.sidebar {
+width: 270px; /* Slightly wider for mobile */
+}
+
+.nav-menu {
+flex-direction: column;
+}
+
+.nav-menu a {
+padding: 1rem;
+}
+
+.main-content {
+margin-left: 0;
+width: 100%;
+padding: 1rem;
+}
+}
+
 
   </style>
 </head>
 <body>
-    <button class="close-btn" onclick="window.location.href='sellerDash.html';">
-        <svg viewBox="0 0 24 24">
-            <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
-        </svg>
-    </button> 
+  <div class="hamburger" onclick="toggleMenu()">
+    <i class="fas fa-bars"></i>
+</div>
+<div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="logo">
+            <img src="../images/logo.png" alt="AquaMarket">
+            <span class="logo-text"><b>AQUAMARKET</b></span>
+        </div>
+        <ul class="nav-menu">
+          <a href="sellerDash.html"><i class="fas fa-chart-line"></i> Overview</a>
+            <a href="addProduct.html"><i class="fas fa-plus"></i> Add products</a>
+            <a href="ProductList.html"><i class="fas fa-list"></i> Product List</a>
+            <a href="order.html" class="active"><i class="fas fa-shopping-cart"></i> Orders</a>
+            <a href="review2.html"><i class="fas fa-star"></i>Reviews</a>
+        </ul>
+    </div>
 
+    <main class="main-content">
   <h1>Orders</h1>
   <div class="search-container">
     <input type="text" id="orderSearch" placeholder="Search by Order ID" />
@@ -193,6 +385,8 @@
     <tbody></tbody>
   </table>
   <button id="deleteSelectedOrders" style="display: none;">Delete Selected Orders</button>
+
+</main>
  
 
 
@@ -330,7 +524,8 @@
   });
 
   // Function to update order status
-  function updateOrderStatus(orderIndex, status) {
+  // Function to update order status
+function updateOrderStatus(orderIndex, status) {
   const orderToUpdate = sellerOrders[orderIndex];
 
   if (!orderToUpdate) {
@@ -342,10 +537,10 @@
   orderToUpdate.status = status;
 
   // Remove the order from its current position
-  const [approvedOrder] = sellerOrders.splice(orderIndex, 1);
+  const [updatedOrder] = sellerOrders.splice(orderIndex, 1);
 
   // Add the order to the end of the array
-  sellerOrders.push(approvedOrder);
+  sellerOrders.push(updatedOrder);
 
   // Update localStorage
   localStorage.setItem(sellerOrdersKey, JSON.stringify(sellerOrders));
@@ -364,7 +559,13 @@
   // Re-render the order table
   renderOrders(sellerOrders);
 }
+
  });
+
+ function toggleMenu() {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.toggle('active');
+}
   </script>
 
 

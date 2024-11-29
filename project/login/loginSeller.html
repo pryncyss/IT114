@@ -5,24 +5,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login Seller</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <link rel="stylesheet" href="login.css">
+  <style>
+   
+  </style>
 </head>
 <body>
   <div class="container">
     <button class="close-button" onclick="window.location.href='start.html';">&times;</button>
-    <!-- Left Side - Login Form -->
     <div class="login-section">
-      <h2>Login as<br>Seller</h2>
+      <h2>Log In as<br>Seller</h2>
       <form id="loginForm">
-        <!-- Added name attributes -->
         <input type="text" id="username" name="username" placeholder="Username or Work Email" required>
-        <input type="password" id="password" name="password" placeholder="Password" required>
-        <a href="#" class="forgot-password">Forgot Password?</a>
-        <button type="submit">Login</button>
+        <div class="password-wrapper">
+          <input type="password" id="password" name="password" placeholder="Password" required>
+          <i class="fa fa-eye password-toggle" id="togglePassword"></i>
+        </div>
+        <a href="#" class="forgot-password" id="forgotPasswordLink">Forgot Password?</a>
+        <button type="submit">Log In</button>
       </form>
     </div>
 
-    <!-- Right Side - Logo and Description -->
     <div class="info-section">
       <div class="logo">
         <img src="logo.png" alt="Aqua Market Logo">
@@ -32,46 +36,82 @@
     </div>
   </div>
 
+  <!-- Modal for Forgot Password -->
+  <div class="modal" id="forgotPasswordModal">
+    <div class="modal-content">
+      <h3>Reset Password</h3>
+      <input type="email" id="resetEmail" placeholder="Enter your email" required>
+      <input type="password" id="newPassword" placeholder="Enter your new password" required>
+      <div>
+        <button class="confirm-btn" id="confirmReset">Reset</button>
+        <button class="cancel-btn" id="cancelReset">Cancel</button>
+      </div>
+    </div>
+  </div>
 
- <script>
-document.getElementById('loginForm').addEventListener('submit', function(event) {
-    event.preventDefault();
+  <script>
+    // Login Form Submission
+    document.getElementById('loginForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      const users = JSON.parse(localStorage.getItem('users')) || [];
 
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
-    const users = JSON.parse(localStorage.getItem('users')) || [];
+      const user = users.find(user => user.email === username && user.password === password && user.role === 'seller');
 
-    // Check if the user exists and has the seller role
-    const user = users.find(user => user.email === username && user.password === password && user.role === 'seller');
-
-    if (user) {
-        // Store the seller's unique ID in localStorage
+      if (user) {
         localStorage.setItem('currentSellerId', user.id);
-
-        // Ensure the seller's data is initialized in localStorage
-        const sellerKey = `seller_${user.id}`;
-        if (!localStorage.getItem(sellerKey)) {
-            const initialSellerData = { products: [], orders: [] };
-            localStorage.setItem(sellerKey, JSON.stringify(initialSellerData));
-        }
-
         alert('Login successful!');
-        window.location.href = '../seller/sellerDash.html'; // Redirect to the seller's dashboard
-    } else {
-        alert('Invalid credentials or you are not registered as a seller.');
-    }
-});
-
-document.addEventListener('DOMContentLoaded', function() {
-    const currentSellerId = localStorage.getItem('currentSellerId');
-
-    if (currentSellerId) {
-        // If a seller is already logged in, redirect them to their dashboard
         window.location.href = '../seller/sellerDash.html';
-    }
-});
-</script>
+      } else {
+        alert('Invalid credentials or you are not registered as a seller.');
+      }
+    });
 
+    // Show/Hide Password
+    document.getElementById('togglePassword').addEventListener('click', function () {
+      const passwordField = document.getElementById('password');
+      const type = passwordField.type === 'password' ? 'text' : 'password';
+      passwordField.type = type;
+      this.classList.toggle('fa-eye-slash');
+    });
 
+    // Forgot Password Functionality
+    const forgotPasswordModal = document.getElementById('forgotPasswordModal');
+
+    document.getElementById('forgotPasswordLink').addEventListener('click', function (event) {
+      event.preventDefault();
+      forgotPasswordModal.style.display = 'flex';
+    });
+
+    document.getElementById('confirmReset').addEventListener('click', function () {
+      const email = document.getElementById('resetEmail').value.trim();
+      const newPassword = document.getElementById('newPassword').value.trim();
+
+      if (!email || !newPassword) {
+        alert('Please fill in all fields.');
+        return;
+      }
+
+      const users = JSON.parse(localStorage.getItem('users')) || [];
+      const user = users.find(user => user.email === email && user.role === 'seller');
+
+      if (user) {
+        user.password = newPassword;
+
+        const updatedUsers = users.map(u => (u.id === user.id ? user : u));
+        localStorage.setItem('users', JSON.stringify(updatedUsers));
+
+        alert('Password reset successfully!');
+        forgotPasswordModal.style.display = 'none';
+      } else {
+        alert('No account found with that email.');
+      }
+    });
+
+    document.getElementById('cancelReset').addEventListener('click', function () {
+      forgotPasswordModal.style.display = 'none';
+    });
+  </script>
 </body>
 </html>

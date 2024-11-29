@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Reviews</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="sellerDash.css">
+    <style>
+
+                * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+        background-color: #1a1b2e;
+        color:#ffffff;
+        }
+
+        .container {
+        display: flex;
+        min-height: 100vh;
+        }
+
+        h1{
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .products-grid {
+        display: flex;
+        gap: 20px;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 15px;
+        scrollbar-width: none; 
+        -ms-overflow-style: none; 
+        }
+
+        .products-grid::-webkit-scrollbar {
+        display: none;
+        }
+
+        /* Product Card Styles */
+        .productCard {
+        width: 220px; /* Fixed width */
+        height: 330px; /* Fixed height */
+        background-color: #242544;
+        padding: 1rem;
+        border-radius: 12px;
+        text-align: center;
+        scroll-snap-align: start;
+        flex-shrink: 0;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .productCard:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Image Wrapper Styles */
+        .image-wrapper {
+        background: #0c3c44;
+        border: 2px solid #08B6D9;
+        width: 100%;
+        height: 200px; /* Fixed height for uniformity */
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        overflow: hidden; 
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        }
+
+        .image-wrapper img {
+        border-radius: 8px;
+        width: 100%; 
+        height: 100%; 
+        object-fit: contain; /* Prevent distortion */
+        }
+
+        /* Product Details */
+        .productCard h3 {
+        font-size: 1rem;
+        color: #fff;
+        text-align: start;
+        margin-top: 8px;
+        margin-bottom: auto;
+        white-space: nowrap; /* Prevent text wrapping */
+        overflow: hidden; /* Hide overflowing text */
+        text-overflow: ellipsis; /* Add "..." for overflowing text */
+        }
+
+        .productCard p {
+        font-size: 14px;
+        color: #fff;
+        text-align: start;
+        margin: 5px 0;
+        }
+
+        .productCard .price {
+        text-align: start;
+        font-size: 1rem;
+        color: #08B6D9;
+        font-weight: bold;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #1a1b2e;
+            padding: 20px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            color: #fff;
+            position: relative;
+        }
+
+        .modal-content img {
+            width: auto;
+            height: auto;
+            object-fit: contents;
+            margin-bottom: 15px;
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .modal-header h2 {
+            text-align: start;
+            margin: 10px 0;
+        }
+
+        .modal-header p {
+            text-align: start;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .close-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #fff;
+}
+
+        .review {
+            padding: 15px;
+            border: 1px solid #444;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background-color: #252640;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .review-header strong {
+            font-size: 14px;
+        }
+
+        .review-header small {
+            color: #888;
+        }
+
+        .review p {
+            margin: 5px 0;
+        }
+
+        .reply {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #8ebed6;
+        }
+
+        .reply-form textarea {
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            background-color: #1a1b2e;
+            color: #fff;
+            resize: none;
+        }
+
+        .reply-form button {
+            margin-top: 10px;
+            background-color: #08b6d9;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .reply-form button:hover {
+            background-color: #07a1c7;
+        }
+
+        .close-Btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.1);
+    transition: background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-Btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.close-Btn svg {
+    width: 20px;
+    height: 20px;
+    fill: white;
+}
+
+    </style>
+</head>
+<body>
+   
+    <div class="hamburger" onclick="toggleMenu()">
+        <i class="fas fa-bars"></i>
+    </div>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="logo">
+                <img src="../images/logo.png" alt="AquaMarket">
+                <span class="logo-text"><b>AQUAMARKET</b></span>
+            </div>
+            <ul class="nav-menu">
+                <a href="sellerDash.html"><i class="fas fa-chart-line"></i> Overview</a>
+                <a href="addProduct.html"><i class="fas fa-plus"></i> Add products</a>
+                <a href="ProductList.html"><i class="fas fa-list"></i> Product List</a>
+                <a href="order.html"><i class="fas fa-shopping-cart"></i> Orders</a>
+                <a href="review2.html" class="active"><i class="fas fa-star"></i>Reviews</a>
+            </ul>
+        </div>
+
+    <main class="main-content">
+    <header>
+        <h1>Product Reviews</h1>
+    </header>
+
+    <section>
+        <div class="products-grid" id="productList">
+            <!-- Products will be dynamically loaded here -->
+        </div>
+    </section>
+
+    <!-- Modal -->
+    <div class="modal" id="reviewModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+            <div class="modal-header">
+                <img id="modalImage" alt="Product Image">
+                <h2 id="modalTitle"></h2>
+                <p id="modalRating"></p>
+            </div>
+            <div id="modalReviews">
+                <!-- Reviews will be dynamically loaded here -->
+            </div>
+        </div>
+    </div>
+</main>
+    <script src="review.js"></script>
+</body>
+</html>

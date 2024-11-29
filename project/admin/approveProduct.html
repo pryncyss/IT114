@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Approve Products</title>
+    <link rel="stylesheet" href="admin2.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+
+.header {
+    display: flex;
+    justify-content: center; /* Centers horizontally */
+    align-items: center; /* Centers vertically */
+    text-align: center; /* Ensures text is centered */
+    padding: 1rem;
+    margin-bottom: 2rem;
+    color: white; /* Optional: Set header text color */
+    border-radius: 8px; /* Optional: Add rounded corners */
+    font-size: 1.5rem; /* Adjust font size */
+}
+/* Table Styling */
+.product-table {
+    width: 100%;
+    margin: 20px 0;
+    font-size: 1rem;
+    text-align: left;
+}
+
+.product-table th, .product-table td {
+    padding: 10px;
+}
+
+.product-table th {
+    border-bottom: 1px solid #2a2b3e;
+    color: #8ebed6;
+    text-align: center;
+}
+
+.product-table td {
+    vertical-align: middle;
+    text-align: center;
+}
+
+.product-table img {
+    max-width: 50px;
+    height: auto;
+    border-radius: 4px;
+}
+
+/* Button Styling */
+.approve-btn {
+    background-color: #28a745;
+    color: white;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.approve-btn:hover {
+    background-color: #218838;
+}
+
+.deny-btn {
+    background-color: #dc3545;
+    color: white;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.deny-btn:hover {
+    background-color: #c82333;
+}
+
+
+    </style>
+</head>
+<body>
+    <div class="hamburger" onclick="toggleMenu()">
+        <i class="fas fa-bars"></i>
+    </div>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="logo">
+                <img src="../images/logo.png" alt="AquaMarket">
+                <span class="logo-text"><b>ADMIN PANEL</b></span>
+            </div>
+            <ul class="nav-menu">
+                <a href="../admin/admin2.html"><i class="fas fa-home"></i>Home</a>
+                <a href="../admin/approveProduct.html" class="active"><i class="fas fa-check-circle"></i> Approve Products</a>
+                <a href="../admin/manageAcc.html"><i class="fas fa-users"></i> Manage Accounts</a>
+            </ul>
+        </div>
+
+       
+            <!-- Main Content -->
+            <main class="main-content">
+                <header class="header">
+                    <h2>Approve Products</h2>
+                </header>
+    
+                <section class="products-section">
+                    <table class="product-table">
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Name</th>
+                                <th>Price</th>
+                                <th>Size</th>
+                                <th>Seller</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pendingProducts">
+                            <!-- Pending products will be rendered dynamically -->
+                        </tbody>
+                    </table>
+                </section>
+            </main>
+    
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+    const pendingProductsTable = document.getElementById('pendingProducts');
+
+    // Fetch all pending products
+    function fetchAllPendingProducts() {
+        let allPendingProducts = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key.startsWith('pending_products_')) {
+                const sellerProducts = JSON.parse(localStorage.getItem(key)) || [];
+                allPendingProducts = allPendingProducts.concat(
+                    sellerProducts.map(product => ({ ...product, key }))
+                );
+            }
+        }
+        return allPendingProducts;
+    }
+
+    // Approve product
+    function approveProduct(productId, sellerId) {
+        if (typeof productId !== 'string') {
+            console.error('Invalid productId:', productId);
+            return;
+        }
+
+        const pendingKey = `pending_products_${sellerId}`;
+        const approvedKey = `products_${sellerId}`;
+        const globalKey = 'products';
+
+        // Fetch pending products
+        const pendingProducts = JSON.parse(localStorage.getItem(pendingKey)) || [];
+        console.log('Pending Key:', pendingKey);
+        console.log('Pending Products:', pendingProducts);
+
+        // Find the product by ID
+        const productIndex = pendingProducts.findIndex(product => product.id === productId);
+        if (productIndex === -1) {
+            console.error('Product not found in pending list. Double-check the product ID or seller ID.');
+            return;
+        }
+
+        // Approve the product
+        const [approvedProduct] = pendingProducts.splice(productIndex, 1);
+        approvedProduct.inStock = true; // Mark as in-stock
+
+        // Fetch existing approved and global products
+        const approvedProducts = JSON.parse(localStorage.getItem(approvedKey)) || [];
+        const globalProducts = JSON.parse(localStorage.getItem(globalKey)) || [];
+
+        approvedProducts.push(approvedProduct);
+        globalProducts.push(approvedProduct);
+
+        // Save updated lists
+        localStorage.setItem(pendingKey, JSON.stringify(pendingProducts));
+        localStorage.setItem(approvedKey, JSON.stringify(approvedProducts));
+        localStorage.setItem(globalKey, JSON.stringify(globalProducts));
+
+        console.log('Approved Product:', approvedProduct);
+        alert(`Product ${approvedProduct.name} has been approved.`);
+
+        // Re-render pending products
+        renderPendingProducts();
+    }
+
+    // Deny product
+    function denyProduct(productId, key) {
+        const sellerPendingProducts = JSON.parse(localStorage.getItem(key)) || [];
+        const updatedProducts = sellerPendingProducts.filter(p => p.id !== productId);
+        localStorage.setItem(key, JSON.stringify(updatedProducts));
+
+        alert('Product denied!');
+        renderPendingProducts();
+    }
+
+    // Render pending products
+    function renderPendingProducts() {
+        const allPendingProducts = fetchAllPendingProducts();
+        pendingProductsTable.innerHTML = '';
+
+        if (allPendingProducts.length === 0) {
+            pendingProductsTable.innerHTML = '<tr><td colspan="6">No pending products.</td></tr>';
+            return;
+        }
+
+        allPendingProducts.forEach(product => {
+            const productRow = document.createElement('tr');
+            productRow.innerHTML = `
+                <td><img src="${product.image || 'default-image.jpg'}" alt="${product.name}" style="width: 50px; height: auto; border-radius: 4px;"></td>
+                <td>${product.name}</td>
+                <td>₱${product.price}</td>
+                <td>${product.size}</td>
+                <td>${product.sellerId || 'Unknown'}</td>
+                <td>
+                    <button class="approve-btn">Approve</button>
+                    <button class="deny-btn">Deny</button>
+                </td>
+            `;
+
+            // Attach event listeners for approval and denial
+            productRow.querySelector('.approve-btn').addEventListener('click', () =>
+                approveProduct(product.id, product.key.replace('pending_products_', ''))
+            );
+            productRow.querySelector('.deny-btn').addEventListener('click', () =>
+                denyProduct(product.id, product.key)
+            );
+
+            pendingProductsTable.appendChild(productRow);
+        });
+    }
+
+    // Initial render of pending products
+    renderPendingProducts();
+});
+
+function toggleMenu() {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.toggle('active');
+}
+
+    </script>
+</body>
+</html>

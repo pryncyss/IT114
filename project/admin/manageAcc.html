@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Accounts</title>
+    <link rel="stylesheet" href="admin2.css"> <!-- Reuse existing styles -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        .header {
+            display: flex;
+            justify-content: center; 
+            align-items: center; 
+            text-align: center; 
+            padding: 1rem;
+            margin-bottom: 2rem;
+            color: white; 
+            border-radius: 8px; 
+            font-size: 1.5rem; 
+        }
+
+        /* Search Bar Styling */
+        .search-bar {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .search-bar input {
+            padding: 0.5rem;
+            font-size: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .search-bar button {
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .search-bar .search-btn {
+            background-color: #007bff;
+        }
+
+        .search-bar .search-btn:hover {
+            background-color: #0056b3;
+        }
+
+        /* Table Styling */
+        .account-table {
+            width: 100%;
+            margin: 20px 0;
+            font-size: 1rem;
+            text-align: left;
+        }
+
+        .account-table th, .account-table td {
+            padding: 10px;
+        }
+
+        .account-table th {
+            border-bottom: 1px solid #2a2b3e;
+            color: #8ebed6;
+            text-align: center;
+        }
+
+        .account-table td {
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        .account-table button.delete-btn {
+            background-color: #dc3545;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .account-table button.delete-btn:hover {
+            background-color: #c82333;
+        }
+
+    
+        </style>
+    </head>
+    <body>
+        <div class="hamburger" onclick="toggleMenu()">
+            <i class="fas fa-bars"></i>
+        </div>
+        <div class="container">
+            <!-- Sidebar -->
+            <div class="sidebar" id="sidebar">
+                <div class="logo">
+                    <img src="../images/logo.png" alt="AquaMarket">
+                    <span class="logo-text"><b>ADMIN PANEL</b></span>
+                </div>
+                <ul class="nav-menu">
+                    <a href="../admin/admin2.html"><i class="fas fa-home"></i>Home</a>
+                    <a href="../admin/approveProduct.html"><i class="fas fa-check-circle"></i> Approve Products</a>
+                    <a href="../admin/manageAcc.html" class="active"><i class="fas fa-users"></i> Manage Accounts</a>
+                </ul>
+            </div>
+        <main class="main-content">
+            <header class="header">
+                <h2>Manage Accounts</h2>
+            </header>
+
+            <section class="accounts-section">
+                <h3>All Users</h3>
+                <div class="search-bar">
+                    <input type="text" id="searchUserId" placeholder="Enter User ID to search">
+                    <button class="search-btn" onclick="searchUser()">Search</button>
+                </div>
+
+
+                <table class="account-table">
+                    <thead>
+                        <tr>
+                            <th>User ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userAccounts">
+                        <!-- Users will be dynamically loaded here -->
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const userAccountsTable = document.getElementById('userAccounts');
+
+            // Fetch all users from the 'users' key in localStorage
+            function fetchAllUsers() {
+                const users = JSON.parse(localStorage.getItem('users')) || [];
+                console.log("Users fetched:", users); // Debugging log
+                return users;
+            }
+
+            // Delete user account
+            function deleteAccount(userId) {
+                const allUsers = fetchAllUsers();
+                const updatedUsers = allUsers.filter(user => user.id !== userId);
+                localStorage.setItem('users', JSON.stringify(updatedUsers));
+
+                alert("User account deleted successfully.");
+                renderAccounts();
+            }
+
+            // Render users in the table
+            function renderAccounts() {
+                const users = fetchAllUsers();
+                userAccountsTable.innerHTML = ''; // Clear existing rows
+
+                if (users.length === 0) {
+                    userAccountsTable.innerHTML = '<tr><td colspan="5">No registered users.</td></tr>';
+                    return;
+                }
+
+                users.forEach(user => {
+                    const role = user.role || 'Unknown'; // Use the 'role' property if it exists
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${user.id}</td>
+                        <td>${user.name}</td>
+                        <td>${user.email || 'No email provided'}</td>
+                        <td>${role}</td>
+                        <td>
+                            <button class="delete-btn" onclick="deleteAccount('${user.id}')">Delete</button>
+                        </td>
+                    `;
+                    userAccountsTable.appendChild(row);
+                });
+            }
+
+            // Expose deleteAccount globally for button functionality
+            window.deleteAccount = deleteAccount;
+
+            // Initialize
+            renderAccounts();
+        });
+
+        function toggleMenu() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+    const userAccountsTable = document.getElementById('userAccounts');
+
+    // Fetch all users from the 'users' key in localStorage
+    function fetchAllUsers() {
+        const users = JSON.parse(localStorage.getItem('users')) || [];
+        return users;
+    }
+
+    // Delete user account
+    function deleteAccount(userId) {
+        const allUsers = fetchAllUsers();
+        const updatedUsers = allUsers.filter(user => user.id !== userId);
+        localStorage.setItem('users', JSON.stringify(updatedUsers));
+
+        alert("User account deleted successfully.");
+        renderAccounts();
+    }
+
+    // Render users in the table
+    function renderAccounts(users = fetchAllUsers()) {
+        userAccountsTable.innerHTML = ''; // Clear existing rows
+
+        if (users.length === 0) {
+            userAccountsTable.innerHTML = '<tr><td colspan="5">No registered users.</td></tr>';
+            return;
+        }
+
+        users.forEach(user => {
+            const role = user.role || 'Unknown'; // Use the 'role' property if it exists
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${user.id}</td>
+                <td>${user.name}</td>
+                <td>${user.email || 'No email provided'}</td>
+                <td>${role}</td>
+                <td>
+                    <button class="delete-btn" onclick="deleteAccount('${user.id}')">Delete</button>
+                </td>
+            `;
+            userAccountsTable.appendChild(row);
+        });
+    }
+
+    // Search functionality
+    function searchUser() {
+        const searchId = document.getElementById('searchUserId').value.trim();
+        const allUsers = fetchAllUsers();
+
+        if (!searchId) {
+            alert('Please enter a User ID to search.');
+            return;
+        }
+
+        const filteredUsers = allUsers.filter(user => user.id.includes(searchId));
+
+        if (filteredUsers.length === 0) {
+            userAccountsTable.innerHTML = '<tr><td colspan="5">No matching users found.</td></tr>';
+        } else {
+            renderAccounts(filteredUsers);
+        }
+    }
+
+    // Expose functions globally
+    window.deleteAccount = deleteAccount;
+    window.searchUser = searchUser;
+
+    // Initialize
+    renderAccounts();
+});
+
+    </script>
+</body>
+</html>

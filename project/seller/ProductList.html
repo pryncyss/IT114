@@ -3,21 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="sellerDash.css">
     <title>Product List</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        body {
-            background-color: #1a1b2e;
-            color: #fff;
-            padding: 20px;
-        }
 
         .header {
             padding: 20px;
@@ -128,16 +118,25 @@
         }
 
         .product-details {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
+    display: flex; 
+    gap: 15px; 
+    justify-content: flex-start;
+}
+
+
+.product-name {
+    font-size: 16px; /* Adjust font size */
+    font-weight: bold; 
+    display: inline-block;
+}
+
 
         .product-image {
             width: 40px;
             height: 40px;
             background-color: #fff;
             border-radius: 4px;
+            object-fit: contents;
         }
 
         .checkbox-wrapper {
@@ -263,12 +262,26 @@
     </style>
 </head>
 <body>
-    <button class="close-btn" onclick="window.location.href='sellerDash.html';">
-        <svg viewBox="0 0 24 24">
-            <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
-        </svg>
-    </button>
+    <div class="hamburger" onclick="toggleMenu()">
+        <i class="fas fa-bars"></i>
+    </div>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="logo">
+                <img src="../images/logo.png" alt="AquaMarket">
+                <span class="logo-text"><b>AQUAMARKET</b></span>
+            </div>
+            <ul class="nav-menu">
+                <a href="sellerDash.html"><i class="fas fa-chart-line"></i> Overview</a>
+                <a href="addProduct.html"><i class="fas fa-plus"></i> Add products</a>
+                <a href="ProductList.html"><i class="fas fa-list"></i> Product List</a>
+                <a href="order.html"><i class="fas fa-shopping-cart"></i> Orders</a>
+                <a href="review2.html"><i class="fas fa-star"></i>Reviews</a>
+            </ul>
+        </div>
 
+<main class="main-content">
     <div class="header">
         <div class="header-text">
             <h1>Product List</h1>
@@ -341,178 +354,253 @@
             </form>
         </div>
     </div>
-    
+</main>   
     <script>
+
+function loadApprovedProducts() {
+    const currentSellerId = localStorage.getItem('currentSellerId');
+    if (!currentSellerId) {
+        alert('No seller logged in.');
+        return;
+    }
+
+    const approvedKey = `products_${currentSellerId}`;
+    const productsGrid = document.getElementById('productsGrid');
+    if (!productsGrid) {
+        console.error('Products grid element is missing.');
+        return;
+    }
+
+    const approvedProducts = JSON.parse(localStorage.getItem(approvedKey)) || [];
+    productsGrid.innerHTML = ''; // Clear existing products
+
+    if (approvedProducts.length === 0) {
+        productsGrid.innerHTML = '<p>No approved products available.</p>';
+        return;
+    }
+
+    approvedProducts.forEach(product => {
+        const productCard = `
+            <div class="productCard">
+                <div class="image-wrapper">
+                    <img src="${product.image || 'default-image.jpg'}" alt="${product.name}">
+                </div>
+                <h3>${product.name}</h3>
+                <p>${product.size}</p>
+                <p class="price">₱${product.price}/KG</p>
+            </div>
+        `;
+        productsGrid.innerHTML += productCard;
+    });
+}
+
+document.addEventListener('DOMContentLoaded', loadApprovedProducts);
+
+
     
-    document.addEventListener('DOMContentLoaded', function () {
-        const productList = document.getElementById('productList');
-        const deleteSelected = document.getElementById('deleteSelected');
-        const editModal = document.getElementById('editModal');
-        const selectAllCheckbox = document.getElementById('selectAll');
-        const currentSellerId = localStorage.getItem('currentSellerId');
-    
-        if (!currentSellerId) {
-            alert('No seller logged in.');
+document.addEventListener('DOMContentLoaded', function () {
+    const productList = document.getElementById('productList');
+    const deleteSection = document.querySelector('.delete-section');
+    const selectAllCheckbox = document.getElementById('selectAll');
+    const deleteSelectedButton = document.getElementById('deleteSelected');
+    const editModal = document.getElementById('editModal');
+    const currentSellerId = localStorage.getItem('currentSellerId');
+
+    if (!currentSellerId) {
+        alert('No seller logged in.');
+        return;
+    }
+
+    const sellerProductsKey = `products_${currentSellerId}`;
+
+    // Load Products
+    function loadProducts() {
+        const products = JSON.parse(localStorage.getItem(sellerProductsKey)) || [];
+        productList.innerHTML = ''; // Clear existing products
+
+        if (products.length === 0) {
+            productList.innerHTML = '<p>No products available.</p>';
+            deleteSection.style.display = 'none';
             return;
         }
-    
-        const sellerProductsKey = `products_${currentSellerId}`;
-    
-        // Load Products
-        function loadProducts() {
-            const products = JSON.parse(localStorage.getItem(sellerProductsKey)) || [];
-            productList.innerHTML = ''; // Clear existing products
-    
-            products.forEach((product) => {
-                const productItem = document.createElement('div');
-                productItem.classList.add('product-item');
-                productItem.dataset.productId = product.id;
-    
-                const stockBtnClass = product.inStock ? 'btn-success' : 'btn-danger';
-                const stockBtnText = product.inStock ? 'In Stock' : 'Out of Stock';
-    
-                productItem.innerHTML = `
-                    <input type="checkbox" class="product-checkbox">
-                    <div class="product-details">
-                        <img src="${product.image || 'default-image.png'}" alt="${product.name}" class="product-image">
-                        <div>${product.name}</div>
-                    </div>
-                    <div>${product.category}</div>
-                    <div>${product.size}</div>
-                    <div>₱${product.price}</div>
-                    <div>
-                        <button class="edit-btn">Edit</button>
-                        <button class="delete-btn">Delete</button>
-                        <button class="stock-btn ${stockBtnClass}">${stockBtnText}</button>
-                    </div>
-                `;
-                productList.appendChild(productItem);
-            });
-    
-            // Reset select-all checkbox
-            selectAllCheckbox.checked = false;
-            updateSelectedCount();
-        }
-    
-        // Toggle Stock Status
-        function toggleStockStatus(productId) {
-            const products = JSON.parse(localStorage.getItem(sellerProductsKey)) || [];
-            const product = products.find((p) => p.id === productId);
-    
-            if (product) {
-                product.inStock = !product.inStock; // Toggle stock status
-                localStorage.setItem(sellerProductsKey, JSON.stringify(products)); // Save updated list
-                loadProducts(); // Reload product list
-            }
-        }
-    
-        // Open Edit Modal
-        function openEditModal(productId) {
-            const products = JSON.parse(localStorage.getItem(sellerProductsKey)) || [];
-            const product = products.find((p) => p.id === productId);
-    
-            if (product) {
-                // Populate the form with product details
-                document.getElementById('editName').value = product.name;
-                document.getElementById('productCategory').value = product.category;
-                document.getElementById('productSize').value = product.size;
-                document.getElementById('editPrice').value = product.price;
-    
-                // Save productId for later
-                document.getElementById('editForm').dataset.productId = productId;
-    
-                // Show modal
-                editModal.style.display = 'block';
-            }
-        }
-    
-        // Save Edited Product
-        document.getElementById('editForm').addEventListener('submit', function (event) {
-            event.preventDefault();
-    
-            const products = JSON.parse(localStorage.getItem(sellerProductsKey)) || [];
-            const productId = this.dataset.productId;
-            const product = products.find((p) => p.id === productId);
-    
-            if (product) {
-                // Update product details
-                product.name = document.getElementById('editName').value;
-                product.category = document.getElementById('productCategory').value;
-                product.size = document.getElementById('productSize').value;
-                product.price = parseFloat(document.getElementById('editPrice').value);
-    
-                // Save updated list
-                localStorage.setItem(sellerProductsKey, JSON.stringify(products));
-                loadProducts(); // Reload list
-                closeModal(); // Close modal
-            }
+
+        products.forEach((product) => {
+            const productItem = document.createElement('div');
+            productItem.classList.add('product-item');
+            productItem.dataset.productId = product.id;
+
+            const stockBtnClass = product.inStock ? 'btn-success' : 'btn-danger';
+            const stockBtnText = product.inStock ? 'In Stock' : 'Out of Stock';
+
+            productItem.innerHTML = `
+                <input type="checkbox" class="product-checkbox" data-product-id="${product.id}">
+                <div class="product-details">
+                    <img src="${product.image || 'default-image.jpg'}" alt="${product.name}" class="product-image">
+                    <div class="product-name">${product.name}</div>
+                </div>
+                <div>${product.category}</div>
+                <div>${product.size}</div>
+                <div>₱${product.price}</div>
+                <div>
+                    <button class="edit-btn" data-product-id="${product.id}">Edit</button>
+                    <button class="delete-btn" data-product-id="${product.id}">Delete</button>
+                    <button class="stock-btn ${stockBtnClass}" data-product-id="${product.id}">${stockBtnText}</button>
+                </div>
+            `;
+            productList.appendChild(productItem);
         });
+
+        // Reset select-all checkbox
+        selectAllCheckbox.checked = false;
+        updateSelectedCount();
+    }
+
     
-        /// Close Modal
+
+    // Open Edit Modal
+    function openEditModal(productId) {
+        const products = JSON.parse(localStorage.getItem(sellerProductsKey)) || [];
+        const product = products.find((p) => p.id === productId);
+
+        if (product) {
+            document.getElementById('editName').value = product.name;
+            document.getElementById('productCategory').value = product.category;
+            document.getElementById('productSize').value = product.size;
+            document.getElementById('editPrice').value = product.price;
+
+            document.getElementById('editForm').dataset.productId = productId;
+            editModal.style.display = 'block';
+        }
+    }
+
+    // Save Edited Product
+    document.getElementById('editForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const products = JSON.parse(localStorage.getItem(sellerProductsKey)) || [];
+        const productId = this.dataset.productId;
+        const product = products.find((p) => p.id === productId);
+
+        if (product) {
+            product.name = document.getElementById('editName').value;
+            product.category = document.getElementById('productCategory').value;
+            product.size = document.getElementById('productSize').value;
+            product.price = parseFloat(document.getElementById('editPrice').value);
+
+            localStorage.setItem(sellerProductsKey, JSON.stringify(products));
+            loadProducts();
+            closeModal();
+        }
+    });
+
     window.closeModal = function () { // Make globally accessible
         editModal.style.display = 'none';
     };
 
-    
-        // Delete Product
-        function deleteProduct(productId) {
-            let products = JSON.parse(localStorage.getItem(sellerProductsKey)) || [];
-            products = products.filter((product) => product.id !== productId);
+    // Toggle Stock Status
+    function toggleStockStatus(productId) {
+        const products = JSON.parse(localStorage.getItem(sellerProductsKey)) || [];
+        const product = products.find((p) => p.id === productId);
+
+        if (product) {
+            product.inStock = !product.inStock;
             localStorage.setItem(sellerProductsKey, JSON.stringify(products));
             loadProducts();
-            updateSelectedCount();
         }
-    
-        // Delete Multiple Products
-        function deleteMultipleProducts() {
-            const selectedCheckboxes = document.querySelectorAll('.product-checkbox:checked');
-            const selectedIds = Array.from(selectedCheckboxes).map((checkbox) =>
-                checkbox.closest('.product-item').dataset.productId
-            );
-    
-            let products = JSON.parse(localStorage.getItem(sellerProductsKey)) || [];
-            products = products.filter((product) => !selectedIds.includes(product.id));
-            localStorage.setItem(sellerProductsKey, JSON.stringify(products));
-            loadProducts();
-            updateSelectedCount();
+    }
+
+    // Event Delegation for Product List
+    productList.addEventListener('click', function (event) {
+        const target = event.target;
+        const productId = target.dataset.productId;
+
+        if (target.classList.contains('edit-btn')) {
+            openEditModal(productId);
+        } else if (target.classList.contains('delete-btn')) {
+            deleteProduct(productId);
+        } else if (target.classList.contains('stock-btn')) {
+            toggleStockStatus(productId);
         }
-    
-        // Event Delegation for Product List
-        productList.addEventListener('click', function (event) {
-            const target = event.target;
-            const productItem = target.closest('.product-item');
-            const productId = productItem ? productItem.dataset.productId : null;
-    
-            if (target.classList.contains('edit-btn')) {
-                openEditModal(productId);
-            } else if (target.classList.contains('delete-btn')) {
-                deleteProduct(productId);
-            } else if (target.classList.contains('stock-btn')) {
-                toggleStockStatus(productId);
-            }
-        });
-    
-        // Update Selected Count
-        function updateSelectedCount() {
-            const checkedBoxes = document.querySelectorAll('.product-checkbox:checked');
-            const count = checkedBoxes.length;
-            const deleteSection = document.querySelector('.delete-section');
-    
-            deleteSection.style.display = count > 0 ? 'flex' : 'none';
-            document.getElementById('selectedCount').textContent = count;
-            deleteSelected.disabled = count === 0;
-        }
-    
-        // Handle Select All Checkbox
-        selectAllCheckbox.addEventListener('change', function () {
-            const checkboxes = document.querySelectorAll('.product-checkbox');
-            checkboxes.forEach((checkbox) => (checkbox.checked = this.checked));
-            updateSelectedCount();
-        });
-    
-        // Initialize
-        loadProducts();
     });
+    // Update Selected Count
+    function updateSelectedCount() {
+                const checkedBoxes = document.querySelectorAll('.product-checkbox:checked');
+                const count = checkedBoxes.length;
+
+                if (count > 0) {
+                    deleteSection.style.display = 'flex';
+                } else {
+                    deleteSection.style.display = 'none';
+                }
+
+                document.getElementById('selectedCount').textContent = count;
+                deleteSelectedButton.disabled = count === 0;
+            }
+
+            // Delete Single Product
+            function deleteProduct(productId) {
+                let products = JSON.parse(localStorage.getItem(sellerProductsKey)) || [];
+                products = products.filter((product) => product.id !== productId);
+                localStorage.setItem(sellerProductsKey, JSON.stringify(products));
+
+                alert("Product deleted successfully!");
+                loadProducts();
+                updateSelectedCount();
+            }
+
+            // Delete Multiple Products
+            function deleteMultipleProducts() {
+                const selectedCheckboxes = document.querySelectorAll('.product-checkbox:checked');
+                const selectedIds = Array.from(selectedCheckboxes).map((checkbox) =>
+                    checkbox.dataset.productId
+                );
+
+                if (selectedIds.length === 0) {
+                    alert('No products selected for deletion.');
+                    return;
+                }
+
+                let products = JSON.parse(localStorage.getItem(sellerProductsKey)) || [];
+                products = products.filter((product) => !selectedIds.includes(product.id));
+                localStorage.setItem(sellerProductsKey, JSON.stringify(products));
+
+                alert(`${selectedIds.length} product(s) deleted successfully!`);
+                loadProducts();
+                updateSelectedCount();
+            }
+
+            // Handle Select All Checkbox
+            selectAllCheckbox.addEventListener('change', function () {
+                const checkboxes = document.querySelectorAll('.product-checkbox');
+                checkboxes.forEach((checkbox) => (checkbox.checked = this.checked));
+                updateSelectedCount();
+            });
+
+            // Handle Individual Checkbox Changes
+            productList.addEventListener('change', function (event) {
+                if (event.target.classList.contains('product-checkbox')) {
+                    updateSelectedCount();
+
+                    // Update "Select All" checkbox state
+                    const allCheckboxes = document.querySelectorAll('.product-checkbox');
+                    const checkedCheckboxes = document.querySelectorAll('.product-checkbox:checked');
+                    selectAllCheckbox.checked = allCheckboxes.length === checkedCheckboxes.length;
+                }
+            });
+
+            // Handle Delete Selected Button Click
+            deleteSelectedButton.addEventListener('click', deleteMultipleProducts);
+
+            // Initialize
+            loadProducts();
+        });
+
+
+
+    function toggleMenu() {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.toggle('active');
+}
     
 
     </script>

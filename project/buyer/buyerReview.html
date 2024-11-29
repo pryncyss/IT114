@@ -247,42 +247,42 @@
 
         // Submit review
         function submitReview() {
-            const textArea = document.getElementById('reviewText');
-            const activeStars = document.querySelectorAll('#starRating span.active').length;
+    const textArea = document.getElementById('reviewText');
+    const activeStars = document.querySelectorAll('#starRating span.active').length;
+    const itemName = new URLSearchParams(window.location.search).get('item');
 
-            if (textArea.value.trim() === '') {
-                alert('Please write a review before submitting');
-                return;
-            }
+    if (textArea.value.trim() === '') {
+        alert('Please write a review before submitting.');
+        return;
+    }
 
-            const newReview = {
-                name: "You",
-                date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
-                rating: activeStars,
-                text: textArea.value,
-                helpful: 0
-            };
+    // Create a new review object
+    const newReview = {
+        buyer: localStorage.getItem('currentBuyerId') || 'Anonymous',
+        comment: textArea.value.trim(),
+        rating: activeStars,
+        date: new Date().toLocaleDateString(),
+    };
 
-            product.reviews.unshift(newReview);
+    // Save to localStorage under the corresponding seller and product
+    const sellerId = localStorage.getItem('currentSellerId'); // Assuming seller ID is tracked
+    const reviewsKey = `reviews_${sellerId}`;
+    const allReviews = JSON.parse(localStorage.getItem(reviewsKey)) || {};
 
-            // Update product rating
-            const totalRatings = product.reviews.reduce((sum, review) => sum + review.rating, 0);
-            product.rating = totalRatings / product.reviews.length;
+    if (!allReviews[itemName]) {
+        allReviews[itemName] = [];
+    }
 
-            // Display the updated reviews
-            displayReviews();
+    allReviews[itemName].push(newReview);
+    localStorage.setItem(reviewsKey, JSON.stringify(allReviews));
 
-            // Reset the form
-            textArea.value = '';
-            setRating(0);
-        }
+    // Reset form and redirect
+    textArea.value = '';
+    setRating(0);
+    alert('Thank you for your review!');
+    window.location.href = 'purchased.html';
+}
 
-        // Mark review as helpful
-        function markHelpful(button) {
-            const currentCount = parseInt(button.textContent.match(/\d+/)[0]);
-            button.textContent = `👍 Helpful (${currentCount + 1})`;
-            button.disabled = true;
-        }
 
         // Initialize on page load
         displayReviews();

@@ -6,23 +6,24 @@
   <title>Login Buyer</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="login.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
   <div class="container">
     <button class="close-button" onclick="window.location.href='start.html';">&times;</button>
-    <!-- Left Side - Login Form -->
     <div class="login-section">
-      <h2>Login as<br>Buyer</h2>
+      <h2>Log In as<br>Buyer</h2>
       <form id="loginForm">
-        <!-- Correct IDs for input fields -->
         <input type="text" id="username" name="username" placeholder="Username or Work Email" required>
-        <input type="password" id="password" name="password" placeholder="Password" required>
-        <a href="#" class="forgot-password">Forgot Password?</a>
-        <button type="submit">Login</button>
+        <div class="password-wrapper">
+          <input type="password" id="password" name="password" placeholder="Password" required>
+          <i class="fa fa-eye password-toggle" id="togglePassword"></i>
+        </div>
+        <a href="#" class="forgot-password" id="forgotPasswordLink">Forgot Password?</a>
+        <button type="submit">Log In</button>
       </form>
     </div>
-  
-    <!-- Right Side - Logo and Description -->
+
     <div class="info-section">
       <div class="logo">
         <img src="logo.png" alt="Aqua Market Logo">
@@ -31,25 +32,81 @@
       <p>Empowering Fish Market<br>Insights at your Fingertips</p>
     </div>
   </div>
+
+  <!-- Modal for Forgot Password -->
+  <div class="modal" id="forgotPasswordModal">
+    <div class="modal-content">
+      <h3>Reset Password</h3>
+      <input type="email" id="resetEmail" placeholder="Enter your email" required>
+      <input type="password" id="newPassword" placeholder="Enter your new password" required>
+      <div>
+        <button class="confirm-btn" id="confirmReset">Reset</button>
+        <button class="cancel-btn" id="cancelReset">Cancel</button>
+      </div>
+    </div>
+  </div>
   
   <script>
     document.getElementById('loginForm').addEventListener('submit', function (event) {
-  event.preventDefault();
+      event.preventDefault();
 
-  const username = document.getElementById('username').value;
-  const password = document.getElementById('password').value;
-  const users = JSON.parse(localStorage.getItem('users')) || [];
-  const user = users.find(user => user.email === username && user.password === password && user.role === 'buyer');
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      const users = JSON.parse(localStorage.getItem('users')) || [];
+      const user = users.find(user => user.email === username && user.password === password && user.role === 'buyer');
 
-  if (user) {
-    localStorage.setItem('currentBuyerId', user.id);
-    window.location.href = '../buyer/buyerDash.html';
-  } else {
-    alert('Invalid credentials.');
-  }
-});
+      if (user) {
+        localStorage.setItem('currentBuyerId', user.id);
+        window.location.href = '../buyer/buyerDash.html';
+      } else {
+        alert('Invalid credentials.');
+      }
+    });
 
+    // Show/hide password functionality
+    document.getElementById('togglePassword').addEventListener('click', function () {
+      const passwordField = document.getElementById('password');
+      const type = passwordField.type === 'password' ? 'text' : 'password';
+      passwordField.type = type;
+      this.classList.toggle('fa-eye-slash');
+    });
+
+    // Forgot Password Functionality
+    const forgotPasswordModal = document.getElementById('forgotPasswordModal');
+
+    document.getElementById('forgotPasswordLink').addEventListener('click', function (event) {
+      event.preventDefault();
+      forgotPasswordModal.style.display = 'flex';
+    });
+
+    document.getElementById('confirmReset').addEventListener('click', function () {
+      const email = document.getElementById('resetEmail').value.trim();
+      const newPassword = document.getElementById('newPassword').value.trim();
+
+      if (!email || !newPassword) {
+        alert('Please fill in all fields.');
+        return;
+      }
+
+      const users = JSON.parse(localStorage.getItem('users')) || [];
+      const user = users.find(user => user.email === email && user.role === 'buyer');
+
+      if (user) {
+        user.password = newPassword;
+
+        const updatedUsers = users.map(u => (u.id === user.id ? user : u));
+        localStorage.setItem('users', JSON.stringify(updatedUsers));
+
+        alert('Password reset successfully!');
+        forgotPasswordModal.style.display = 'none';
+      } else {
+        alert('No account found with that email.');
+      }
+    });
+
+    document.getElementById('cancelReset').addEventListener('click', function () {
+      forgotPasswordModal.style.display = 'none';
+    });
   </script>
-  
 </body>
 </html>

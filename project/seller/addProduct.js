@@ -7,13 +7,22 @@ document.addEventListener('DOMContentLoaded', function () {
     const closeBtn = document.querySelector('.close-btn');
     let imageURL = null;
 
-    // Function to generate a unique product ID
     function generateProductId() {
-        let productIdCounter = parseInt(localStorage.getItem('productIdCounter')) || 0;
+        // Retrieve the counter, initialize it to 0 if not found or invalid
+        let productIdCounter = parseInt(localStorage.getItem('productIdCounter'));
+        if (isNaN(productIdCounter)) {
+            console.warn('Invalid or missing productIdCounter. Initializing to 0.');
+            productIdCounter = 0;
+        }
+    
+        // Increment and save the counter
         productIdCounter++;
-        localStorage.setItem('productIdCounter', productIdCounter); // Save updated ID counter
+        localStorage.setItem('productIdCounter', productIdCounter);
+    
+        // Return the unique product ID
         return `prod-${productIdCounter}`;
     }
+    
 
     // Handle file input change
     imageUpload.addEventListener('change', function (event) {
@@ -25,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 imageURL = e.target.result;
 
                 // Display image preview
-                imagePreview.innerHTML = `<img src="${imageURL}" alt="Preview" style="max-width: 100%; margin-top:10%;height: auto;border-radius: 8px;">`;
+                imagePreview.innerHTML = `<img src="${imageURL}" alt="Preview" style="max-width: 100%; margin-top:10%; height: auto; border-radius: 8px;">`;
                 imageUploadContainer.classList.add('has-preview');
                 removePreviewButton.style.display = 'block'; // Show the remove button
             };
@@ -60,39 +69,43 @@ document.addEventListener('DOMContentLoaded', function () {
     // Handle product form submission
     productForm.addEventListener('submit', function (e) {
         e.preventDefault();
-
+    
         const currentSellerId = localStorage.getItem('currentSellerId');
-if (!currentSellerId) {
-    alert('No seller logged in.');
-    return;
-}
-
-// Use seller-specific key
-const sellerProductsKey = `products_${currentSellerId}`;
-const products = JSON.parse(localStorage.getItem(sellerProductsKey)) || [];
-
-const productData = {
-    id: `prod-${Date.now()}`,
-    name: document.getElementById('productName').value,
-    description: document.getElementById('productDescription').value,
-    category: document.getElementById('productCategory').value,
-    price: document.getElementById('productPrice').value,
-    size: document.getElementById('productSize').value,
-    image: imageURL,
-    sellerId: currentSellerId,
-    inStock: true
-};
-
-products.push(productData);
-localStorage.setItem(sellerProductsKey, JSON.stringify(products));
-
-alert('Product added successfully!');
-
-        // Clear form and reset preview
+        if (!currentSellerId) {
+            alert('No seller logged in.');
+            return;
+        }
+    
+        const pendingProductsKey = `pending_products_${currentSellerId}`;
+        const pendingProducts = JSON.parse(localStorage.getItem(pendingProductsKey)) || [];
+    
+        const productData = {
+            id: generateProductId(),
+            name: document.getElementById('productName').value.trim(),
+            description: document.getElementById('productDescription').value.trim(),
+            category: document.getElementById('productCategory').value,
+            price: parseFloat(document.getElementById('productPrice').value),
+            size: document.getElementById('productSize').value,
+            image: imageURL,
+            sellerId: currentSellerId,
+            inStock: false,
+        };
+    
+        pendingProducts.push(productData);
+        localStorage.setItem(pendingProductsKey, JSON.stringify(pendingProducts));
+    
+        // Debugging the saved pending products
+        console.log('Pending Products:', JSON.parse(localStorage.getItem(pendingProductsKey)));
+    
+        alert('Product submitted for approval!');
         productForm.reset();
-        imagePreview.innerHTML = ''; // Clear preview
+        imagePreview.innerHTML = '';
         imageUploadContainer.classList.remove('has-preview');
         removePreviewButton.style.display = 'none';
         imageURL = null;
     });
-});
+});    
+function toggleMenu() {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.toggle('active');
+}

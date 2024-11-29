@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
-    <link rel="stylesheet" href="sellerDash.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="sellerDash.css">
@@ -22,17 +21,11 @@
                 <span class="logo-text"><b>AQUAMARKET</b></span>
             </div>
             <ul class="nav-menu">
-                <a href="#" class="active"><i class="fas fa-chart-line"></i> Overview</a>
+                <a href="sellerDash.html" class="active"><i class="fas fa-chart-line"></i> Overview</a>
                 <a href="addProduct.html"><i class="fas fa-plus"></i> Add products</a>
                 <a href="ProductList.html"><i class="fas fa-list"></i> Product List</a>
                 <a href="order.html"><i class="fas fa-shopping-cart"></i> Orders</a>
-                <a href="review.html"><i class="fas fa-star"></i>Reviews</a>
-               <!-- <a href="#"><i class="fas fa-briefcase"></i> Business Advisor</a>-->
-               <button id="logout-btn" onclick="handleSellerLogout()">
-                <i class="fas fa-sign-out-alt"></i> Logout
-            </button>
-            
-            
+                <a href="review2.html"><i class="fas fa-star"></i>Reviews</a>
             </ul>
         </div>
 
@@ -95,10 +88,15 @@
                     </button>
             
                   <!-- User Info Icon -->
-                  <button class="icon-btn" onclick="window.location.href='../seller/user-info.html';">
-                    <i class="fas fa-user"></i>
-                  </button>
+                  <div class="dropdownA">
+                    <button class="user-icon"><i class="fas fa-user"></i></button>
+                    <div class="dropdown-contentA">
+                      <a href="user-info.html">Profile</a>
+                      <a id="logout-btn" onclick="handleSellerLogout()">Log Out</a>
+                    </div>
+                  </div>
                 </div>
+
               </header>
               
             <!-- Sales Summary -->
@@ -131,17 +129,47 @@
 
             <!-- Top-Selling Products -->
             <section class="products-section">
-                <h2>Your Product</h2>
-                <div class="products-grid">
-                    <!-- Products will be inserted here by JavaScript -->
+                <h2>Approved Products</h2>
+                <div class="products-grid" id="pendingProducts">
+                    <!-- Pending products will be displayed here -->
                 </div>
             </section>
+            
 
             <!-- Recent Orders -->
+            <!-- Review Modal -->
+<div class="modal" id="reviewModal">
+    <div class="modal-content">
+        <button class="close-btn" onclick="closeModal()">×</button>
+        <div class="modal-header">
+            <img id="modalImage" alt="Product Image">
+            <h2 id="modalTitle"></h2>
+            <p id="modalRating"></p>
+        </div>
+        <div id="modalReviews">
+            <!-- Reviews will be dynamically loaded here -->
+        </div>
+    </div>
+</div>
 
         </main>
     </div>
     <script>
+       document.addEventListener('DOMContentLoaded', function () {
+    const currentSellerId = localStorage.getItem('currentSellerId');
+    if (!currentSellerId) {
+        console.error('No seller ID found.');
+        return;
+    }
+
+    const approvedKey = `products_${currentSellerId}`;
+    console.log('Approved Products:', JSON.parse(localStorage.getItem(approvedKey)));
+
+    // Proceed with loading other parts of the dashboard
+    loadApprovedProducts();
+    loadOrders();
+});
+
         document.addEventListener('DOMContentLoaded', () => {
             const searchInput = document.querySelector('.search-bar input');
             const searchResultsContainer = document.createElement('div');
@@ -488,6 +516,118 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+   
+    document.addEventListener('DOMContentLoaded', function () {
+        const productsGrid = document.querySelector('.products-grid');
+        const reviewModal = document.getElementById('reviewModal');
+        const modalImage = document.getElementById('modalImage');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalRating = document.getElementById('modalRating');
+        const modalReviews = document.getElementById('modalReviews');
+        const closeModalButton = document.querySelector('.close-btn');
+        const currentSellerId = localStorage.getItem('currentSellerId');
+        const reviewsKey = `reviews_${currentSellerId}`;
+
+        // Helper function to generate star ratings
+        function generateStarRating(rating) {
+            const filledStars = '★'.repeat(Math.floor(rating));
+            const emptyStars = '☆'.repeat(5 - Math.floor(rating));
+            return `<span style="color: #f1c40f;">${filledStars}</span><span style="color: #ccc;">${emptyStars}</span>`;
+        }
+
+        // Attach click event listener to existing product cards
+        function attachReviewListeners() {
+            const productCards = document.querySelectorAll('.productCard');
+            productCards.forEach((card) => {
+                const productName = card.querySelector('h3').innerText;
+                const productImage = card.querySelector('.image-wrapper img').src;
+
+                card.addEventListener('click', () => {
+                    const allReviews = JSON.parse(localStorage.getItem(reviewsKey)) || {};
+                    const productReviews = allReviews[productName] || [];
+                    openModal({ name: productName, image: productImage }, productReviews);
+                });
+            });
+        }
+
+        // Open modal and display reviews
+        function openModal(product, reviews) {
+            modalImage.src = product.image || 'default-image.jpg';
+            modalTitle.textContent = product.name;
+            modalRating.textContent = `${reviews.length} Review(s)`;
+
+            modalReviews.innerHTML = reviews.length
+                ? reviews
+                      .map(
+                          (review, index) => `
+                        <div class="review">
+                            <div class="review-header">
+                                <strong>${review.buyer}</strong>
+                                <small>${review.date}</small>
+                            </div>
+                            <div>${generateStarRating(review.rating)}</div>
+                            <p>${review.comment}</p>
+                            ${
+                                review.reply
+                                    ? `<div class="reply"><strong>Seller Reply:</strong> ${review.reply}</div>`
+                                    : `
+                                <div class="reply-form">
+                                    <textarea id="replyInput-${index}" placeholder="Write a reply..."></textarea>
+                                    <button onclick="submitReply(${index}, '${product.name}')">Reply</button>
+                                </div>
+                            `
+                            }
+                        </div>
+                    `
+                      )
+                      .join('')
+                : '<p>No reviews available for this product.</p>';
+
+            reviewModal.style.display = 'flex';
+        }
+
+        // Submit a reply
+        window.submitReply = function (index, productName) {
+            const replyInput = document.getElementById(`replyInput-${index}`);
+            const replyText = replyInput.value.trim();
+
+            if (!replyText) {
+                alert('Reply cannot be empty.');
+                return;
+            }
+
+            const allReviews = JSON.parse(localStorage.getItem(reviewsKey)) || {};
+            const productReviews = allReviews[productName] || [];
+
+            // Add the reply to the specific review
+            productReviews[index].reply = replyText;
+            allReviews[productName] = productReviews;
+
+            // Save back to localStorage
+            localStorage.setItem(reviewsKey, JSON.stringify(allReviews));
+
+            // Reopen modal to reflect updated reply
+            openModal({ name: productName }, productReviews);
+        };
+
+        // Close modal
+        function closeModal() {
+            reviewModal.style.display = 'none';
+        }
+
+        // Attach event listener to close button
+        closeModalButton.addEventListener('click', closeModal);
+
+        // Close modal when clicking outside modal content
+        reviewModal.addEventListener('click', (event) => {
+            if (event.target === reviewModal) {
+                closeModal();
+            }
+        });
+
+        // Attach listeners to product cards
+        attachReviewListeners();
+    });
 
 
         </script>

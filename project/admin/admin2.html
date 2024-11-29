@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="admin2.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="hamburger">
+        <i class="fas fa-bars"></i>
+    </div>
+    
+
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="logo">
+                <img src="../images/logo.png" alt="AquaMarket">
+                <span class="logo-text"><b>ADMIN PANEL</b></span>
+            </div>
+            <ul class="nav-menu">
+                <a href="../admin/admin2.html" class="active"><i class="fas fa-home"></i>Home</a>
+                <a href="../admin/approveProduct.html"><i class="fas fa-check-circle"></i> Approve Products</a>
+                <a href="../admin/manageAcc.html"><i class="fas fa-users"></i> Manage Accounts</a>
+                </button>
+            </ul>
+        </div>
+
+       
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <div class="user-icon-container">
+                    <i class="fas fa-user-circle user-icon"></i>
+                    <div class="user-dropdown">
+                        <p>Admin</p>
+                        <button id="logout-btn" onclick="window.location.href='../login/loginAd.html';">Log Out</button>
+                    </div>
+                </div>
+            </header>
+            <h1>Admin Dashboard</h1>
+            <section class="admin-section">
+                <h2>Welcome, Admin</h2>
+                <p>Select a menu option to manage the platform.</p>
+            </section>
+        </main>
+    </div>
+
+    <!-- Script Section -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const hamburger = document.querySelector('.hamburger');
+            const sidebar = document.getElementById('sidebar');
+    
+            // Attach click event to the hamburger menu
+            hamburger.addEventListener('click', () => {
+                sidebar.classList.toggle('active');
+            });
+        });
+    </script>
+    
+    
+</body>
+</html>
