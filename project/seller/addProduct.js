@@ -67,43 +67,53 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Handle product form submission
-    productForm.addEventListener('submit', function (e) {
-        e.preventDefault();
+    // Handle product form submission
+productForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    // Check if an image is uploaded
+    if (!imageURL) {
+        alert('Please upload a product image before submitting.');
+        return;
+    }
+
+    const currentSellerId = localStorage.getItem('currentSellerId');
+    if (!currentSellerId) {
+        alert('No seller logged in.');
+        return;
+    }
+
+    const pendingProductsKey = `pending_products_${currentSellerId}`;
+    const pendingProducts = JSON.parse(localStorage.getItem(pendingProductsKey)) || [];
+
+    const productData = {
+        id: generateProductId(),
+        name: document.getElementById('productName').value.trim(),
+        description: document.getElementById('productDescription').value.trim(),
+        category: document.getElementById('productCategory').value,
+        price: parseFloat(document.getElementById('productPrice').value),
+        size: document.getElementById('productSize').value,
+        origin: document.getElementById('productOrigin').value.trim(), // New field
+        image: imageURL,
+        sellerId: currentSellerId,
+        inStock: false,
+    };
     
-        const currentSellerId = localStorage.getItem('currentSellerId');
-        if (!currentSellerId) {
-            alert('No seller logged in.');
-            return;
-        }
-    
-        const pendingProductsKey = `pending_products_${currentSellerId}`;
-        const pendingProducts = JSON.parse(localStorage.getItem(pendingProductsKey)) || [];
-    
-        const productData = {
-            id: generateProductId(),
-            name: document.getElementById('productName').value.trim(),
-            description: document.getElementById('productDescription').value.trim(),
-            category: document.getElementById('productCategory').value,
-            price: parseFloat(document.getElementById('productPrice').value),
-            size: document.getElementById('productSize').value,
-            image: imageURL,
-            sellerId: currentSellerId,
-            inStock: false,
-        };
-    
-        pendingProducts.push(productData);
-        localStorage.setItem(pendingProductsKey, JSON.stringify(pendingProducts));
-    
-        // Debugging the saved pending products
-        console.log('Pending Products:', JSON.parse(localStorage.getItem(pendingProductsKey)));
-    
-        alert('Product submitted for approval!');
-        productForm.reset();
-        imagePreview.innerHTML = '';
-        imageUploadContainer.classList.remove('has-preview');
-        removePreviewButton.style.display = 'none';
-        imageURL = null;
-    });
+
+    pendingProducts.push(productData);
+    localStorage.setItem(pendingProductsKey, JSON.stringify(pendingProducts));
+
+    // Debugging the saved pending products
+    console.log('Pending Products:', JSON.parse(localStorage.getItem(pendingProductsKey)));
+
+    alert('Product submitted for approval!');
+    productForm.reset();
+    imagePreview.innerHTML = '';
+    imageUploadContainer.classList.remove('has-preview');
+    removePreviewButton.style.display = 'none';
+    imageURL = null;
+});
+
 });    
 function toggleMenu() {
     const sidebar = document.getElementById('sidebar');

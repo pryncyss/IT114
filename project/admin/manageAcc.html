@@ -144,27 +144,27 @@
         document.addEventListener('DOMContentLoaded', function () {
             const userAccountsTable = document.getElementById('userAccounts');
 
-            // Fetch all users from the 'users' key in localStorage
             function fetchAllUsers() {
-                const users = JSON.parse(localStorage.getItem('users')) || [];
-                console.log("Users fetched:", users); // Debugging log
-                return users;
+                return JSON.parse(localStorage.getItem('users')) || [];
             }
 
-            // Delete user account
             function deleteAccount(userId) {
-                const allUsers = fetchAllUsers();
-                const updatedUsers = allUsers.filter(user => user.id !== userId);
-                localStorage.setItem('users', JSON.stringify(updatedUsers));
+                const confirmDelete = confirm("Are you sure you want to delete this account? This action cannot be undone.");
 
-                alert("User account deleted successfully.");
-                renderAccounts();
+                if (confirmDelete) {
+                    const allUsers = fetchAllUsers();
+                    const updatedUsers = allUsers.filter(user => user.id !== userId);
+                    localStorage.setItem('users', JSON.stringify(updatedUsers));
+
+                    alert("User account deleted successfully.");
+                    renderAccounts();
+                } else {
+                    alert("Account deletion canceled.");
+                }
             }
 
-            // Render users in the table
-            function renderAccounts() {
-                const users = fetchAllUsers();
-                userAccountsTable.innerHTML = ''; // Clear existing rows
+            function renderAccounts(users = fetchAllUsers()) {
+                userAccountsTable.innerHTML = '';
 
                 if (users.length === 0) {
                     userAccountsTable.innerHTML = '<tr><td colspan="5">No registered users.</td></tr>';
@@ -172,13 +172,12 @@
                 }
 
                 users.forEach(user => {
-                    const role = user.role || 'Unknown'; // Use the 'role' property if it exists
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${user.id}</td>
                         <td>${user.name}</td>
                         <td>${user.email || 'No email provided'}</td>
-                        <td>${role}</td>
+                        <td>${user.role || 'Unknown'}</td>
                         <td>
                             <button class="delete-btn" onclick="deleteAccount('${user.id}')">Delete</button>
                         </td>
@@ -187,10 +186,27 @@
                 });
             }
 
-            // Expose deleteAccount globally for button functionality
-            window.deleteAccount = deleteAccount;
+            function searchUser() {
+                const searchId = document.getElementById('searchUserId').value.trim();
+                const allUsers = fetchAllUsers();
 
-            // Initialize
+                if (!searchId) {
+                    alert('Please enter a User ID to search.');
+                    return;
+                }
+
+                const filteredUsers = allUsers.filter(user => user.id.includes(searchId));
+
+                if (filteredUsers.length === 0) {
+                    userAccountsTable.innerHTML = '<tr><td colspan="5">No matching users found.</td></tr>';
+                } else {
+                    renderAccounts(filteredUsers);
+                }
+            }
+
+            window.deleteAccount = deleteAccount;
+            window.searchUser = searchUser;
+
             renderAccounts();
         });
 
@@ -198,78 +214,7 @@
             const sidebar = document.getElementById('sidebar');
             sidebar.classList.toggle('active');
         }
-
-        document.addEventListener('DOMContentLoaded', function () {
-    const userAccountsTable = document.getElementById('userAccounts');
-
-    // Fetch all users from the 'users' key in localStorage
-    function fetchAllUsers() {
-        const users = JSON.parse(localStorage.getItem('users')) || [];
-        return users;
-    }
-
-    // Delete user account
-    function deleteAccount(userId) {
-        const allUsers = fetchAllUsers();
-        const updatedUsers = allUsers.filter(user => user.id !== userId);
-        localStorage.setItem('users', JSON.stringify(updatedUsers));
-
-        alert("User account deleted successfully.");
-        renderAccounts();
-    }
-
-    // Render users in the table
-    function renderAccounts(users = fetchAllUsers()) {
-        userAccountsTable.innerHTML = ''; // Clear existing rows
-
-        if (users.length === 0) {
-            userAccountsTable.innerHTML = '<tr><td colspan="5">No registered users.</td></tr>';
-            return;
-        }
-
-        users.forEach(user => {
-            const role = user.role || 'Unknown'; // Use the 'role' property if it exists
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${user.id}</td>
-                <td>${user.name}</td>
-                <td>${user.email || 'No email provided'}</td>
-                <td>${role}</td>
-                <td>
-                    <button class="delete-btn" onclick="deleteAccount('${user.id}')">Delete</button>
-                </td>
-            `;
-            userAccountsTable.appendChild(row);
-        });
-    }
-
-    // Search functionality
-    function searchUser() {
-        const searchId = document.getElementById('searchUserId').value.trim();
-        const allUsers = fetchAllUsers();
-
-        if (!searchId) {
-            alert('Please enter a User ID to search.');
-            return;
-        }
-
-        const filteredUsers = allUsers.filter(user => user.id.includes(searchId));
-
-        if (filteredUsers.length === 0) {
-            userAccountsTable.innerHTML = '<tr><td colspan="5">No matching users found.</td></tr>';
-        } else {
-            renderAccounts(filteredUsers);
-        }
-    }
-
-    // Expose functions globally
-    window.deleteAccount = deleteAccount;
-    window.searchUser = searchUser;
-
-    // Initialize
-    renderAccounts();
-});
-
     </script>
+
 </body>
 </html>

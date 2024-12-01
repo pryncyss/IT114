@@ -91,6 +91,7 @@
         <!-- Right Section: Description, Price, and Controls -->
         <div class="modal-right">
           <p id="productDescription" class="product-description">Description of the product</p>
+          <p id="productOrigin" class="product-origin">Origin: Unknown</p>
           <p id="productPrice" class="product-price">Price: ₱0.00</p>
           
           <div class="quantity-control">
@@ -178,12 +179,14 @@
     }
 
     updateContent(product) {
-      this.productTitleEl.textContent = product.name;
-      this.productImageEl.src = product.image || 'default-image.png';
-      this.productDescriptionEl.textContent = product.description;
-      this.productPriceEl.textContent = `₱${product.price}`;
-      this.quantityInput.value = 1;
-    }
+  this.productTitleEl.textContent = product.name;
+  this.productImageEl.src = product.image || 'default-image.png';
+  this.productDescriptionEl.textContent = product.description;
+  this.productPriceEl.textContent = `₱${product.price}`;
+  document.getElementById('productOrigin').textContent = `Origin: ${product.origin || 'Unknown'}`; // New Field
+  this.quantityInput.value = 1;
+}
+
 
     adjustQuantity(change) {
       const currentQuantity = parseInt(this.quantityInput.value, 10);
@@ -387,15 +390,17 @@ const productModal = new ProductModal();
                     // Add event listener to open modal
                     productCard.addEventListener('click', () => {
                       productModal.open({
-                        id: product.id, // Unique product ID
-                        sellerId: product.sellerId, // Seller ID
+                        id: product.id,
+                        sellerId: product.sellerId,
                         name: product.name,
                         image: product.image,
                         description: product.description,
                         price: product.price,
+                        origin: product.origin, // Ensure origin is passed
                         inStock: product.inStock,
                       });
                     });
+
 
                     productsGrid.appendChild(productCard);
                 });
